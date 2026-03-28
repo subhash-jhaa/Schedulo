@@ -1,0 +1,1 @@
+export default function BookingModal() { return null; }
