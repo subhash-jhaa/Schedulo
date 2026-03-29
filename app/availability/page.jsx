@@ -163,7 +163,7 @@ export default function AvailabilityPage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-[#080C10] flex text-white font-inter">
+      <div className="min-h-screen bg-surface-dark flex text-white font-inter">
         <Sidebar />
         <main className="flex-1 ml-[240px] p-10 flex items-center justify-center">
           <motion.div
@@ -171,7 +171,7 @@ export default function AvailabilityPage() {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center gap-4"
           >
-            <Loader2 className="animate-spin text-[#00D4AA]" size={40} />
+            <Loader2 className="animate-spin text-brand" size={40} />
             <p className="text-sm opacity-40 font-inter">Loading your settings...</p>
           </motion.div>
         </main>
@@ -180,7 +180,7 @@ export default function AvailabilityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080C10] flex text-white font-inter">
+    <div className="min-h-screen bg-surface-dark flex text-white font-inter">
       <Sidebar />
       
       <main className="flex-1 ml-[240px] p-10 overflow-auto">
@@ -191,7 +191,7 @@ export default function AvailabilityPage() {
 
         <div className="max-w-3xl space-y-8">
           {/* Timezone Section */}
-          <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl shadow-xl">
+          <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 bg-blue-500 bg-opacity-10 rounded-xl text-blue-400">
                 <Globe size={22} />
@@ -206,7 +206,7 @@ export default function AvailabilityPage() {
               <select 
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="w-full appearance-none bg-[#080C10] border border-white border-opacity-10 p-4 px-5 rounded-xl text-white focus:ring-2 focus:ring-[#00D4AA]/20 focus:border-[#00D4AA] outline-none cursor-pointer hover:border-opacity-30 transition-all font-inter"
+                className="w-full appearance-none bg-surface-dark border border-white border-opacity-10 p-4 px-5 rounded-xl text-white focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none cursor-pointer hover:border-opacity-30 transition-all font-inter"
               >
                 {!commonTimezones.includes(timezone) && (
                    <option value={timezone}>{timezone}</option>
@@ -223,7 +223,7 @@ export default function AvailabilityPage() {
 
           {/* Slot Settings Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl shadow-xl">
+            <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 bg-purple-500 bg-opacity-10 rounded-xl text-purple-400">
                   <Clock size={20} />
@@ -233,13 +233,13 @@ export default function AvailabilityPage() {
               <select 
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full bg-[#080C10] border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-[#00D4AA] focus:ring-2 focus:ring-[#00D4AA]/20 transition-all font-inter"
+                className="w-full bg-surface-dark border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all font-inter"
               >
                 {durations.map(d => <option key={d} value={d}>{d} minutes</option>)}
               </select>
             </section>
 
-            <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl shadow-xl">
+            <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 bg-orange-500 bg-opacity-10 rounded-xl text-orange-400">
                   <Settings2 size={20} />
@@ -249,7 +249,7 @@ export default function AvailabilityPage() {
               <select 
                 value={buffer}
                 onChange={(e) => setBuffer(Number(e.target.value))}
-                className="w-full bg-[#080C10] border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-[#00D4AA] focus:ring-2 focus:ring-[#00D4AA]/20 transition-all font-inter"
+                className="w-full bg-surface-dark border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all font-inter"
               >
                 {buffers.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
               </select>
@@ -257,9 +257,9 @@ export default function AvailabilityPage() {
           </div>
 
           {/* Day Grid */}
-          <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl shadow-xl">
+          <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
             <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 bg-[#00D4AA] bg-opacity-10 rounded-xl text-[#00D4AA]">
+              <div className="p-3 bg-brand bg-opacity-10 rounded-xl text-brand">
                 <CalendarDays size={22} />
               </div>
               <h3 className="font-bold text-lg font-syne">Work hours</h3>
@@ -272,13 +272,13 @@ export default function AvailabilityPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + (i * 0.05) }}
-                  className="flex flex-col sm:flex-row items-center justify-between p-5 bg-[#080C10] border border-white border-opacity-5 rounded-2xl group transition-all hover:border-opacity-10 bg-gradient-to-r hover:from-[#111820] hover:to-[#080C10]"
+                  className="flex flex-col sm:flex-row items-center justify-between p-5 bg-surface-dark border border-white border-opacity-5 rounded-2xl group transition-all hover:border-opacity-10 bg-gradient-to-r hover:from-surface hover:to-surface-dark"
                 >
                   <div className="flex items-center gap-6 w-full sm:w-auto">
                     {/* Toggle Switch */}
                     <button 
                       onClick={() => toggleDay(i)}
-                      className={`relative w-12 h-6 flex-shrink-0 rounded-full transition-all duration-300 border-none cursor-pointer ${day.enabled ? "bg-[#00D4AA]" : "bg-white bg-opacity-10"}`}
+                      className={`relative w-12 h-6 flex-shrink-0 rounded-full transition-all duration-300 border-none cursor-pointer ${day.enabled ? "bg-brand" : "bg-white bg-opacity-10"}`}
                     >
                       <motion.div 
                         initial={false}
@@ -297,18 +297,18 @@ export default function AvailabilityPage() {
                       value={day.startTime}
                       onChange={(e) => updateTime(i, 'startTime', e.target.value)}
                       disabled={!day.enabled}
-                      className="bg-transparent border border-white border-opacity-10 p-2.5 rounded-xl text-sm text-white outline-none cursor-pointer hover:border-opacity-30 focus:border-[#00D4AA] transition-all font-inter"
+                      className="bg-transparent border border-white border-opacity-10 p-2.5 rounded-xl text-sm text-white outline-none cursor-pointer hover:border-opacity-30 focus:border-brand transition-all font-inter"
                     >
-                      {timeSlots.map(t => <option key={t.value} value={t.value} className="bg-[#111820]">{t.label}</option>)}
+                      {timeSlots.map(t => <option key={t.value} value={t.value} className="bg-surface">{t.label}</option>)}
                     </select>
                     <span className="opacity-20 text-xs font-inter uppercase tracking-widest">to</span>
                     <select 
                       value={day.endTime}
                       onChange={(e) => updateTime(i, 'endTime', e.target.value)}
                       disabled={!day.enabled}
-                      className="bg-transparent border border-white border-opacity-10 p-2.5 rounded-xl text-sm text-white outline-none cursor-pointer hover:border-opacity-30 focus:border-[#00D4AA] transition-all font-inter"
+                      className="bg-transparent border border-white border-opacity-10 p-2.5 rounded-xl text-sm text-white outline-none cursor-pointer hover:border-opacity-30 focus:border-brand transition-all font-inter"
                     >
-                      {timeSlots.map(t => <option key={t.value} value={t.value} className="bg-[#111820]">{t.label}</option>)}
+                      {timeSlots.map(t => <option key={t.value} value={t.value} className="bg-surface">{t.label}</option>)}
                     </select>
                   </div>
                 </motion.div>
@@ -326,7 +326,7 @@ export default function AvailabilityPage() {
               className={`w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-2xl transition-all cursor-pointer border-none font-syne text-lg ${
                 saveStatus === 'success' ? "bg-green-500 text-white" : 
                 saveStatus === 'error' ? "bg-red-500 text-white" :
-                "bg-gradient-to-r from-[#00D4AA] to-[#009BF2] text-black"
+                "bg-brand text-black hover:bg-brand-hover"
               }`}
             >
               {isSaving ? (
@@ -345,197 +345,6 @@ export default function AvailabilityPage() {
                 "Save changes"
               )}
             </motion.button>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-    } catch (error) {
-      console.error("Error saving availability:", error);
-      setSaveStatus('error');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const toggleDay = (index) => {
-    const newDays = [...days];
-    newDays[index] = { ...newDays[index], enabled: !newDays[index].enabled };
-    setDays(newDays);
-  };
-
-  const updateTime = (index, field, value) => {
-    const newDays = [...days];
-    newDays[index] = { ...newDays[index], [field]: value };
-    setDays(newDays);
-  };
-
-  if (initialLoading) {
-    return (
-      <div className="min-h-screen bg-[#080C10] flex text-white font-inter">
-        <Sidebar />
-        <main className="flex-1 ml-[240px] p-10 flex items-center justify-center">
-          <Loader2 className="animate-spin text-[#00D4AA]" size={40} />
-        </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-[#080C10] flex text-white font-inter">
-      <Sidebar />
-      
-      <main className="flex-1 ml-[240px] p-10 overflow-auto">
-        <header className="mb-10">
-          <h1 className="text-3xl font-syne font-bold mb-2">Your availability</h1>
-          <p className="text-white opacity-40">Set the times you're open for bookings</p>
-        </header>
-
-        <div className="max-w-3xl space-y-10">
-          {/* Timezone Section */}
-          <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-blue-500 bg-opacity-10 rounded-xl text-blue-400">
-                <Globe size={20} />
-              </div>
-              <div>
-                <h3 className="font-bold">Your timezone</h3>
-                <p className="text-xs opacity-40 text-white">This affects how guests see your slots</p>
-              </div>
-            </div>
-            
-            <select 
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className="w-full bg-[#080C10] border border-white border-opacity-10 p-4 rounded-xl text-white focus:border-[#00D4AA] outline-none cursor-pointer hover:border-opacity-30 transition-all"
-            >
-              {[
-                "UTC", "America/New_York", "Europe/London", "Asia/Kolkata", "Asia/Dubai", "Europe/Paris", "Pacific/Auckland"
-              ].map(tz => (
-                <option key={tz} value={tz}>{tz}</option>
-              ))}
-            </select>
-          </section>
-
-          {/* Slot Settings Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-purple-500 bg-opacity-10 rounded-xl text-purple-400">
-                  <Clock size={20} />
-                </div>
-                <h3 className="font-bold">Meeting duration</h3>
-              </div>
-              <select 
-                value={duration}
-                onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full bg-[#080C10] border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-[#00D4AA] transition-all"
-              >
-                {durations.map(d => <option key={d} value={d}>{d} minutes</option>)}
-              </select>
-            </section>
-
-            <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-orange-500 bg-opacity-10 rounded-xl text-orange-400">
-                  <Settings2 size={20} />
-                </div>
-                <h3 className="font-bold">Buffer time</h3>
-              </div>
-              <select 
-                value={buffer}
-                onChange={(e) => setBuffer(Number(e.target.value))}
-                className="w-full bg-[#080C10] border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-[#00D4AA] transition-all"
-              >
-                {buffers.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
-              </select>
-            </section>
-          </div>
-
-          {/* Day Grid */}
-          <section className="p-8 bg-[#111820] border border-white border-opacity-5 rounded-3xl">
-            <div className="flex items-center gap-4 mb-10">
-              <div className="p-3 bg-[#00D4AA] bg-opacity-10 rounded-xl text-[#00D4AA]">
-                <CalendarDays size={20} />
-              </div>
-              <h3 className="font-bold">Work hours</h3>
-            </div>
-
-            <div className="space-y-4">
-              {days.map((day, i) => (
-                <motion.div 
-                  key={day.day}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="flex flex-col sm:flex-row items-center justify-between p-4 bg-[#080C10] border border-white border-opacity-5 rounded-2xl group gap-4 sm:gap-0"
-                >
-                  <div className="flex items-center gap-6 w-full sm:w-auto">
-                    {/* Toggle Switch */}
-                    <button 
-                      onClick={() => toggleDay(i)}
-                      className={"relative w-12 h-6 flex-shrink-0 rounded-full transition-all duration-300 border-none cursor-pointer " + (day.enabled ? "bg-[#00D4AA]" : "bg-white bg-opacity-10")}
-                    >
-                      <motion.div 
-                        initial={false}
-                        animate={{ x: day.enabled ? 24 : 4 }}
-                        className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg" 
-                      />
-                    </button>
-                    <span className={"font-bold w-12 transition-opacity " + (day.enabled ? "opacity-100" : "opacity-30")}>{day.day.slice(0,3)}</span>
-                  </div>
-
-                  <div className={"flex items-center gap-4 transition-all w-full sm:w-auto justify-end " + (day.enabled ? "opacity-100" : "opacity-20 pointer-events-none")}>
-                    <select 
-                      value={day.startTime}
-                      onChange={(e) => updateTime(i, 'startTime', e.target.value)}
-                      className="bg-transparent border border-white border-opacity-10 p-2 rounded-lg text-sm text-white outline-none cursor-pointer"
-                    >
-                      {timeSlots.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                    </select>
-                    <span className="opacity-40 text-xs text-white">to</span>
-                    <select 
-                      value={day.endTime}
-                      onChange={(e) => updateTime(i, 'endTime', e.target.value)}
-                      className="bg-transparent border border-white border-opacity-10 p-2 rounded-lg text-sm text-white outline-none cursor-pointer"
-                    >
-                      {timeSlots.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                    </select>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
-          {/* Save Button */}
-          <div className="sticky bottom-6 pt-4">
-            <button 
-              onClick={handleSave}
-              disabled={isSaving}
-              className={"w-full py-5 rounded-3xl font-bold flex items-center justify-center gap-3 shadow-2xl transition-all cursor-pointer border-none " + (
-                saveStatus === 'success' ? "bg-green-500 text-white" : 
-                saveStatus === 'error' ? "bg-red-500 text-white" :
-                "bg-gradient-to-r from-[#00D4AA] to-[#009BF2] text-black hover:scale-[1.02] active:scale-[0.98]"
-              )}
-            >
-              {isSaving ? (
-                <Loader2 className="animate-spin" size={20} />
-              ) : saveStatus === 'success' ? (
-                <>
-                  <Check size={20} />
-                  Saved!
-                </>
-              ) : saveStatus === 'error' ? (
-                <>
-                  <AlertCircle size={20} />
-                  Error!
-                </>
-              ) : (
-                "Save availability"
-              )}
-            </button>
           </div>
         </div>
       </main>

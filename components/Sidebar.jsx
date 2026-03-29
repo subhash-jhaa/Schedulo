@@ -22,10 +22,10 @@ export default function Sidebar() {
   const { user } = useUser();
 
   return (
-    <aside className="w-[240px] fixed left-0 top-0 h-screen bg-[#111820] border-r border-white border-opacity-5 flex flex-col z-50">
+    <aside className="w-[240px] fixed left-0 top-0 h-screen bg-surface border-r border-white border-opacity-5 flex flex-col z-50">
       <div className="p-8 text-white">
         <Link href="/dashboard" className="flex items-center gap-3 group no-underline text-white">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#00D4AA] to-[#008A6F] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(0,212,170,0.2)]">
+          <div className="w-10 h-10 bg-gradient-to-br from-brand to-[#008A6F] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(0,212,170,0.2)]">
             <Calendar className="text-white" size={24} />
           </div>
           <span className="font-syne font-bold text-xl tracking-tight">Schedulo</span>
@@ -37,13 +37,13 @@ export default function Sidebar() {
           const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href} className="no-underline">
-              <div className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive ? "bg-[#00D4AA] text-black font-bold" : "text-white opacity-60 hover:opacity-100 hover:bg-white hover:bg-opacity-5"}`}>
+              <div className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive ? "bg-brand text-black font-bold" : "text-white opacity-60 hover:opacity-100 hover:bg-white hover:bg-opacity-5"}`}>
                 <item.icon size={20} />
                 <span className="text-sm">{item.label}</span>
                 {isActive && (
                   <motion.div 
                     layoutId="activeNav" 
-                    className="absolute inset-0 bg-[#00D4AA] rounded-xl -z-10" 
+                    className="absolute inset-0 bg-brand rounded-xl -z-10" 
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -63,7 +63,7 @@ export default function Sidebar() {
         </div>
         
         <SignOutButton>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-400 hover:bg-opacity-10 rounded-xl transition-all border-none bg-transparent cursor-pointer">
+          <button className="w-full h-12 flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-400 hover:bg-opacity-10 rounded-xl transition-all border-none bg-transparent cursor-pointer">
             <LogOut size={20} />
             <span className="text-sm font-medium">Logout</span>
           </button>

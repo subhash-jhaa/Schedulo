@@ -1,18 +1,21 @@
 import { db } from "@/lib/db";
-import { availability } from "@/lib/schema";
+import { availability, users } from "@/lib/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const [user] = await db.select().from(users).where(eq(users.clerkId, clerkId));
+    if (!user) return NextResponse.json([]);
 
     const userAvailability = await db
       .select()
       .from(availability)
-      .where(eq(availability.userId, userId));
+      .where(eq(availability.userId, user.id));
 
     return NextResponse.json(userAvailability);
   } catch (error) {
@@ -23,26 +26,26 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const [user] = await db.select().from(users).where(eq(users.clerkId, clerkId));
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const body = await req.json();
-    const { days, timezone, duration, buffer } = body;
+    const { days, duration, buffer } = body;
 
-    // Delete existing availability for this user to perform a clean update
-    await db.delete(availability).where(eq(availability.userId, userId));
+    // Clean delete and re-insert
+    await db.delete(availability).where(eq(availability.userId, user.id));
 
-    // Insert new availability records
-    const insertData = days.map(day => ({
-      userId,
-      day: day.day,
+    const insertData = days.map((day) => ({
+      userId: user.id,
+      dayOfWeek: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].indexOf(day.day),
       startTime: day.startTime,
       endTime: day.endTime,
-      enabled: day.enabled,
-      timezone,
-      duration: duration.toString(),
-      buffer: buffer.toString(),
-      createdAt: new Date(),
+      isActive: day.enabled,
+      slotDuration: parseInt(duration),
+      bufferTime: parseInt(buffer),
     }));
 
     if (insertData.length > 0) {

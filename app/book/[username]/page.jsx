@@ -131,21 +131,14 @@ export default function BookingPage() {
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
           timezone: userTimezone,
+          hostUsername: username,
           status: 'confirmed'
         })
       });
 
       if (!res.ok) throw new Error("Booking failed");
       
-      const sessionData = await res.json();
-      setConfirmationData({
-        ...sessionData,
-        host: hostData.host,
-        duration,
-        startTime: startTime,
-        endTime: endTime
-      });
-      setStep(3);
+      router.push(`/confirmation?guest=${guestInfo.name}&host=${hostData.host.name}&date=${format(startTime, 'MMM d, yyyy')}&time=${format(startTime, 'h:mm a')}&tz=${userTimezone}`);
     } catch (err) {
       alert(err.message);
     } finally {

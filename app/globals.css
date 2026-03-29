@@ -7,6 +7,10 @@
 }
 
 @theme inline {
+  --color-brand: var(--accent);
+  --color-brand-hover: #00F7C7;
+  --color-surface: #111820;
+  --color-surface-dark: #080C10;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
@@ -16,7 +20,7 @@
 
 @layer base {
   body {
-    @apply bg-[#080C10] text-white selection:bg-[#00D4AA]/30 selection:text-white;
+    @apply bg-surface-dark text-white selection:bg-brand/30 selection:text-white;
     font-family: var(--font-inter), sans-serif;
   }
 

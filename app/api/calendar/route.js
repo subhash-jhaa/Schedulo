@@ -28,7 +28,10 @@ export async function POST(req) {
 
     // Save back to database
     await db.update(appointments)
-      .set({ googleEventId: eventId })
+      .set({ 
+        googleEventId: eventId,
+        meetLink: hangoutLink
+      })
       .where(eq(appointments.id, appointmentId));
 
     return NextResponse.json({ success: true, eventId, meetLink: hangoutLink });

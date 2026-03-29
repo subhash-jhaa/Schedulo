@@ -94,6 +94,18 @@ export default function RegisterPage() {
 
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId });
+
+        // Sync user to Neon DB
+        await fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.fullName,
+            email: formData.email,
+            username: formData.username,
+          }),
+        });
+
         router.push('/dashboard');
       }
     } catch (err) {
@@ -106,18 +118,18 @@ export default function RegisterPage() {
 
   if (verifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#080C10] relative overflow-hidden font-inter text-white p-4">
+      <div className="min-h-screen flex items-center justify-center bg-surface-dark relative overflow-hidden font-inter text-white p-4">
         <div className="absolute inset-0 z-0 opacity-20" style={{ 
-          backgroundImage: `radial-gradient(circle at 1px 1px, #00D4AA 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, var(--accent) 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }}></div>
         
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md z-10 bg-[#111820] rounded-2xl border border-white/5 shadow-2xl p-8 text-center"
+          className="w-full max-w-md z-10 bg-surface rounded-2xl border border-white/5 shadow-2xl p-8 text-center"
         >
-          <div className="w-16 h-16 bg-[#00D4AA]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#00D4AA]">
+          <div className="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand">
             <Mail size={32} />
           </div>
           <h2 className="text-2xl font-bold font-syne mb-2">Check your email</h2>
@@ -129,14 +141,14 @@ export default function RegisterPage() {
               placeholder="Enter 6-digit code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full bg-[#080C10] border border-white/10 rounded-xl h-12 text-center text-xl tracking-[1em] font-bold focus:ring-2 focus:ring-[#00D4AA]/50 focus:border-[#00D4AA] outline-none transition-all"
+              className="w-full bg-surface-dark border border-white/10 rounded-xl h-12 text-center text-xl tracking-[1em] font-bold focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
               maxLength={6}
             />
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
               disabled={loading || code.length < 6}
-              className="w-full bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-brand text-black h-12 rounded-xl font-bold hover:bg-brand-hover transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : 'Verify & Continue'}
             </button>
@@ -197,7 +209,7 @@ export default function RegisterPage() {
                       placeholder="Full name"
                       value={formData.fullName}
                       onChange={e => setFormData({...formData, fullName: e.target.value})}
-                      className="w-full bg-[#080C10] border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-[#00D4AA]/50 focus:border-[#00D4AA] transition-all outline-none"
+                      className="w-full bg-surface-dark border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all outline-none"
                     />
                   </div>
                   <div className="relative">
@@ -207,7 +219,7 @@ export default function RegisterPage() {
                       placeholder="Email address"
                       value={formData.email}
                       onChange={e => setFormData({...formData, email: e.target.value})}
-                      className="w-full bg-[#080C10] border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-[#00D4AA]/50 focus:border-[#00D4AA] transition-all outline-none"
+                      className="w-full bg-surface-dark border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all outline-none"
                     />
                   </div>
                   <div className="space-y-2">
@@ -218,7 +230,7 @@ export default function RegisterPage() {
                         placeholder="Password"
                         value={formData.password}
                         onChange={e => setFormData({...formData, password: e.target.value})}
-                        className="w-full bg-[#080C10] border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-[#00D4AA]/50 focus:border-[#00D4AA] transition-all outline-none"
+                        className="w-full bg-surface-dark border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all outline-none"
                       />
                     </div>
                     {/* Strength Meter */}
@@ -241,13 +253,13 @@ export default function RegisterPage() {
                   whileTap={{ scale: 0.98 }}
                   disabled={!formData.fullName || !formData.email || formData.password.length < 6}
                   onClick={handleNext}
-                  className="w-full bg-[#00D4AA] text-black h-12 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full bg-brand text-black h-12 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   Next <ArrowRight size={18} />
                 </motion.button>
 
                 <p className="text-center text-sm text-white/40">
-                  Already have an account? <Link href="/login" className="text-[#00D4AA] font-bold hover:underline">Sign in</Link>
+                  Already have an account? <Link href="/login" className="text-brand font-bold hover:underline">Sign in</Link>
                 </p>
               </motion.div>
             )}
@@ -274,10 +286,10 @@ export default function RegisterPage() {
                       value={formData.username}
                       onChange={e => setFormData({...formData, 
                         username: e.target.value.toLowerCase().replace(/\s/g, '')})}
-                      className="w-full bg-[#080C10] border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-[#00D4AA]/50 focus:border-[#00D4AA] transition-all outline-none"
+                      className="w-full bg-surface-dark border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all outline-none"
                     />
                   </div>
-                  <p className="text-xs text-[#00D4AA] font-mono px-2">
+                  <p className="text-xs text-brand font-mono px-2">
                     Your link: schedulo.app/{formData.username || 'username'}
                   </p>
                 </div>
@@ -288,8 +300,8 @@ export default function RegisterPage() {
                   </button>
                   <button 
                     onClick={handleNext}
-                    disabled={formData.username.length < 4}
-                    className="flex-2 bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    disabled={formData.username.length < 3}
+                    className="flex-1 bg-brand text-black h-12 rounded-xl font-bold hover:bg-brand-hover transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     Next <ArrowRight size={18} />
                   </button>
@@ -317,18 +329,18 @@ export default function RegisterPage() {
                       onClick={() => setFormData({...formData, calendar: opt.id})}
                       className={`w-full p-4 rounded-xl border transition-all flex items-center gap-4 text-left ${
                         formData.calendar === opt.id 
-                          ? 'border-[#00D4AA] bg-[#00D4AA]/5 shadow-[0_0_20px_rgba(0,212,170,0.1)]' 
-                          : 'border-white/5 bg-[#080C10] hover:border-white/10'
+                          ? 'border-brand bg-brand/5 shadow-[0_0_20px_rgba(0,212,170,0.1)]' 
+                          : 'border-white/5 bg-surface-dark hover:border-white/10'
                       }`}
                     >
-                      <div className={`p-2 rounded-lg ${formData.calendar === opt.id ? 'bg-[#00D4AA] text-black' : 'bg-white/5 text-white/50'}`}>
+                      <div className={`p-2 rounded-lg ${formData.calendar === opt.id ? 'bg-brand text-black' : 'bg-white/5 text-white/50'}`}>
                         {opt.icon}
                       </div>
                       <div>
                         <h4 className="font-bold text-sm">{opt.name}</h4>
                         <p className="text-xs text-white/40">{opt.desc}</p>
                       </div>
-                      {formData.calendar === opt.id && <Check className="ml-auto text-[#00D4AA]" size={18} />}
+                      {formData.calendar === opt.id && <Check className="ml-auto text-brand" size={18} />}
                     </button>
                   ))}
                 </div>
@@ -347,7 +359,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={handleRegister}
                     disabled={loading}
-                    className="flex-2 bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
+                    className="flex-1 bg-brand text-black h-12 rounded-xl font-bold hover:bg-brand-hover transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
                   >
                     {loading ? <Loader2 className="animate-spin" size={18} /> : 'Create Account'}
                   </button>

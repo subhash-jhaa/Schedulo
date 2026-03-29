@@ -74,7 +74,7 @@ export default function DashboardPage() {
   };
 
   const colors = [
-    "bg-[#00D4AA]",
+    "bg-brand",
     "bg-blue-500",
     "bg-purple-500",
     "bg-pink-500",
@@ -86,14 +86,18 @@ export default function DashboardPage() {
   const totalBookings = safeAppointments.length;
   const cancelledBookings = safeAppointments.filter(a => a.status === "cancelled").length;
   
-  const now = new Date();
-  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-  const thisWeekBookings = safeAppointments.filter(a => new Date(a.date) >= startOfWeek).length;
+  const today = new Date();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  const thisWeekBookings = safeAppointments.filter(
+    a => new Date(a.startTime) >= startOfWeek
+  ).length;
   
   const totalHours = safeAppointments.reduce((acc, curr) => acc + (Number(curr.duration) / 60 || 0), 0).toFixed(1);
 
   return (
-    <div className="min-h-screen bg-[#080C10] flex text-white font-inter">
+    <div className="min-h-screen bg-surface-dark flex text-white font-inter">
       <Sidebar />
       
       <main className="flex-1 ml-[240px] p-10 overflow-auto">
@@ -110,7 +114,7 @@ export default function DashboardPage() {
             onClick={copyLink}
             className="flex items-center gap-2 bg-white bg-opacity-5 border border-white border-opacity-10 px-6 py-3 rounded-xl hover:bg-opacity-10 transition-all font-medium text-white cursor-pointer"
           >
-            {copied ? <Check size={18} className="text-[#00D4AA]" /> : <Copy size={18} />}
+            {copied ? <Check size={18} className="text-brand" /> : <Copy size={18} />}
             {copied ? "Copied!" : "Copy booking link"}
           </button>
         </div>
@@ -128,11 +132,11 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="p-6 bg-[#111820] border border-white border-opacity-5 rounded-2xl"
+              className="p-6 bg-surface border border-white border-opacity-5 rounded-2xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-white opacity-40 text-sm">{stat.label}</span>
-                <stat.icon size={20} className="text-[#00D4AA] opacity-50" />
+                <stat.icon size={20} className="text-brand opacity-50" />
               </div>
               <div className="text-3xl font-syne font-bold">{stat.value}</div>
             </motion.div>
@@ -140,7 +144,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Upcoming Table */}
-        <div className="bg-[#111820] border border-white border-opacity-5 rounded-2xl overflow-hidden">
+        <div className="bg-surface border border-white border-opacity-5 rounded-2xl overflow-hidden">
           <div className="p-6 border-b border-white border-opacity-5 flex justify-between items-center">
             <h2 className="text-xl font-syne font-bold">Upcoming Appointments</h2>
             <div className="p-2 hover:bg-white hover:bg-opacity-5 rounded-lg cursor-pointer transition-all">
@@ -164,7 +168,7 @@ export default function DashboardPage() {
                 <p className="text-white opacity-40 mb-8 max-w-xs">Share your booking link to start receiving appointments from your guests.</p>
                 <button 
                   onClick={copyLink}
-                  className="bg-[#00D4AA] text-black px-8 py-3 rounded-xl font-bold hover:bg-[#00F7C7] transition-all cursor-pointer border-none"
+                  className="bg-brand text-black px-8 py-3 rounded-xl font-bold hover:bg-brand-hover transition-all cursor-pointer border-none"
                 >
                   Share Link
                 </button>
@@ -202,28 +206,28 @@ export default function DashboardPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm font-medium">
-                          {new Date(app.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                          {new Date(app.startTime).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                         </div>
                         <div className="text-xs opacity-40">
-                          {new Date(app.date + "T" + app.time).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} IST
+                          {new Date(app.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                          <span style={{ opacity: 0.4, fontSize: 11 }}> {app.timezone || "UTC"}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm opacity-60">
-                        {app.duration} min
+                        {Math.round((new Date(app.endTime) - new Date(app.startTime)) / 60000)} min
                       </td>
                       <td className="px-6 py-4">
                         <span className={"px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider " + (
-                          app.status === "cancelled" ? "bg-red-500 bg-opacity-20 text-red-400" :
-                          app.type === "Google Meet" ? "bg-green-500 bg-opacity-20 text-green-400" :
-                          app.type === "Zoom" ? "bg-blue-500 bg-opacity-20 text-blue-400" :
-                          "bg-white bg-opacity-10 text-white opacity-60"
+                          app.status === "cancelled"
+                            ? "bg-red-500 bg-opacity-20 text-red-400"
+                            : "bg-green-500 bg-opacity-20 text-green-400"
                         )}>
-                          {app.status === "cancelled" ? "Cancelled" : (app.type || "Virtual")}
+                          {app.status === "cancelled" ? "Cancelled" : "Google Meet"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button className="p-2 text-white bg-transparent hover:bg-white hover:bg-opacity-5 rounded-lg transition-all border-none cursor-pointer">
+                          <button className="p-2 text-white bg-transparent hover:bg-white hover:bg-opacity-5 rounded-lg transition-all border-none cursor-pointer text-sm">
                             Reschedule
                           </button>
                           {app.status !== 'cancelled' && (
@@ -232,7 +236,7 @@ export default function DashboardPage() {
                                 setCancellingId(app.id);
                                 setIsModalOpen(true);
                               }}
-                              className="p-2 text-red-400 bg-transparent hover:bg-red-400 hover:bg-opacity-5 rounded-lg transition-all border-none cursor-pointer"
+                              className="p-2 text-red-400 bg-transparent hover:bg-red-400 hover:bg-opacity-5 rounded-lg transition-all border-none cursor-pointer text-sm"
                             >
                               Cancel
                             </button>
@@ -256,7 +260,7 @@ export default function DashboardPage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#111820] border border-white border-opacity-5 p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl"
+              className="bg-surface border border-white border-opacity-5 p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl"
             >
               <div className="w-16 h-16 bg-red-400 bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-6 text-red-400">
                 <AlertCircle size={32} />

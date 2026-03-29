@@ -4,7 +4,7 @@ import { eq, and, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
-  const { username } = params;
+  const { username } = await params;
 
   try {
     // 1. Get host info

@@ -24,7 +24,7 @@ export async function POST(req) {
       startTime: appointment.startTime,
       endTime: appointment.endTime,
       timezone: appointment.timezone,
-      meetLink: appointment.googleEventId ? `https://meet.google.com/${appointment.googleEventId}` : null // Ideally update from meetLink field if stored
+      meetLink: appointment.meetLink || null
     });
 
     return NextResponse.json({ success: true });
