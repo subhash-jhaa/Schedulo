@@ -18,6 +18,8 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [code, setCode] = useState('');
   const router = useRouter();
 
   // Form states
@@ -42,31 +44,114 @@ export default function RegisterPage() {
   const handleNext = () => setStep(s => s + 1);
   const handleBack = () => setStep(s => s - 1);
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+    
     if (!isLoaded) return;
     setLoading(true);
     setError('');
 
     try {
-      const result = await signUp.create({
+      // Step 1: Create the sign up
+      const res = await signUp.create({
         emailAddress: formData.email,
         password: formData.password,
-        firstName: formData.fullName.split(' ')[0],
-        lastName: formData.fullName.split(' ').slice(1).join(' '),
+        firstName: formData.fullName.split(' ')[0] || 'User',
+        lastName: formData.fullName.split(' ').slice(1).join(' ') || '',
         username: formData.username
       });
 
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        router.push('/dashboard');
-      }
+      // Step 2: Prepare email verification
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      
+      // Step 3: Switch UI to verification
+      setVerifying(true);
     } catch (err) {
-      setError(err.errors[0]?.longMessage || 'Failed to create account');
-      setStep(1); // Reset to first step on error
+      console.error("Clerk Registration Full Error:", err);
+      const errorMessage = err.errors?.[0]?.longMessage || err.message || 'Failed to create account';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!isLoaded) return;
+    setLoading(true);
+    setError('');
+
+    try {
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code,
+      });
+
+      if (completeSignUp.status !== 'complete') {
+        console.log(JSON.stringify(completeSignUp, null, 2));
+        setError("Verification incomplete. Please check all fields.");
+      }
+
+      if (completeSignUp.status === 'complete') {
+        await setActive({ session: completeSignUp.createdSessionId });
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      console.error("Verification Error:", err);
+      setError(err.errors?.[0]?.longMessage || "Invalid verification code");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#080C10] relative overflow-hidden font-inter text-white p-4">
+        <div className="absolute inset-0 z-0 opacity-20" style={{ 
+          backgroundImage: `radial-gradient(circle at 1px 1px, #00D4AA 1px, transparent 0)`,
+          backgroundSize: '40px 40px'
+        }}></div>
+        
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md z-10 bg-[#111820] rounded-2xl border border-white/5 shadow-2xl p-8 text-center"
+        >
+          <div className="w-16 h-16 bg-[#00D4AA]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#00D4AA]">
+            <Mail size={32} />
+          </div>
+          <h2 className="text-2xl font-bold font-syne mb-2">Check your email</h2>
+          <p className="text-white/50 mb-8">We've sent a 6-digit verification code to <br/><span className="text-white">{formData.email}</span></p>
+          
+          <form onSubmit={handleVerify} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Enter 6-digit code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="w-full bg-[#080C10] border border-white/10 rounded-xl h-12 text-center text-xl tracking-[1em] font-bold focus:ring-2 focus:ring-[#00D4AA]/50 focus:border-[#00D4AA] outline-none transition-all"
+              maxLength={6}
+            />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <button
+              type="submit"
+              disabled={loading || code.length < 6}
+              className="w-full bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="animate-spin" size={20} /> : 'Verify & Continue'}
+            </button>
+            <button 
+              type="button"
+              onClick={() => setVerifying(false)}
+              className="text-white/30 text-sm hover:text-white transition-colors"
+            >
+              Back to registration
+            </button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#080C10] relative overflow-hidden font-inter text-white p-4">
@@ -187,7 +272,8 @@ export default function RegisterPage() {
                       type="text"
                       placeholder="username"
                       value={formData.username}
-                      onChange={e => setFormData({...formData, username: e.target.value.toLowerCase().replace(/\s/g, '')})}
+                      onChange={e => setFormData({...formData, 
+                        username: e.target.value.toLowerCase().replace(/\s/g, '')})}
                       className="w-full bg-[#080C10] border border-white/10 rounded-xl h-12 pl-12 pr-4 focus:ring-2 focus:ring-[#00D4AA]/50 focus:border-[#00D4AA] transition-all outline-none"
                     />
                   </div>
@@ -202,8 +288,8 @@ export default function RegisterPage() {
                   </button>
                   <button 
                     onClick={handleNext}
-                    disabled={formData.username.length < 3}
-                    className="flex-[2] bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    disabled={formData.username.length < 4}
+                    className="flex-2 bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     Next <ArrowRight size={18} />
                   </button>
@@ -250,15 +336,20 @@ export default function RegisterPage() {
                 {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
                 <div className="flex gap-4">
-                  <button onClick={handleBack} className="flex-1 h-12 rounded-xl border border-white/10 font-bold hover:bg-white/5 transition-all">
+                  <button 
+                    type="button"
+                    onClick={handleBack} 
+                    className="flex-1 h-12 rounded-xl border border-white/10 font-bold hover:bg-white/5 transition-all text-sm"
+                  >
                     Back
                   </button>
                   <button 
+                    type="button"
                     onClick={handleRegister}
                     disabled={loading}
-                    className="flex-[2] bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2"
+                    className="flex-2 bg-[#00D4AA] text-black h-12 rounded-xl font-bold hover:bg-[#00F7C7] transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
                   >
-                    {loading ? <Loader2 className="animate-spin" size={20} /> : 'Create Account'}
+                    {loading ? <Loader2 className="animate-spin" size={18} /> : 'Create Account'}
                   </button>
                 </div>
               </motion.div>
