@@ -27,8 +27,9 @@ export default function RootLayout({ children }) {
       <html
         lang="en"
         className={`${syne.variable} ${inter.variable} h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col bg-[#080C10] text-white">
+      >        <head>
+          <meta name="color-scheme" content="light" />
+        </head>        <body className="min-h-full flex flex-col bg-[#080C10] text-white">
           {children}
         </body>
       </html>
