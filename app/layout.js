@@ -1,18 +1,11 @@
-import { Syne, Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-syne",
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-gilroy",
   display: "swap",
 });
 
@@ -24,12 +17,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-      <html
-        lang="en"
-        className={`${syne.variable} ${inter.variable} h-full antialiased`}
-      >        <head>
+      <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
+        <head>
           <meta name="color-scheme" content="light" />
-        </head>        <body className="min-h-full flex flex-col bg-[#080C10] text-white">
+        </head>
+        <body className="min-h-full flex flex-col bg-white text-[#0b3558]" style={{ fontFamily: 'var(--font-gilroy), sans-serif' }}>
           {children}
         </body>
       </html>
