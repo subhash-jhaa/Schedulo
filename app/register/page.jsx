@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useSignUp } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Calendar as CalendarIcon, Check, ArrowLeft, ArrowRight, User, Mail, Lock, ShieldCheck, Globe, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 const CALENDAR_OPTIONS = [
   { id: 'google', name: 'Google Calendar', icon: <Globe size={24} />, desc: 'Sync with your Google workspace' },
@@ -14,7 +14,7 @@ const CALENDAR_OPTIONS = [
 ];
 
 export default function RegisterPage() {
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const supabase = createClient();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,27 +50,47 @@ export default function RegisterPage() {
 
   const handleRegister = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (e && e.stopPropagation) e.stopPropagation();
-    
-    if (!isLoaded) return;
     setLoading(true);
     setError('');
 
     try {
-      const res = await signUp.create({
-        emailAddress: formData.email,
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
         password: formData.password,
-        firstName: formData.fullName.split(' ')[0] || 'User',
-        lastName: formData.fullName.split(' ').slice(1).join(' ') || '',
-        username: formData.username
+        options: {
+          data: {
+            full_name: formData.fullName,
+            username: formData.username,
+          },
+        },
       });
 
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      if (signUpError) throw signUpError;
+
+      if (data?.session) {
+        // Email verification is disabled, user is logged in immediately
+        await fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: formData.fullName,
+            email: formData.email,
+            username: formData.username
+          })
+        });
+        router.push('/dashboard');
+        return;
+      }
+
+      if (data?.user?.identities?.length === 0) {
+        setError('User already exists');
+        setLoading(false);
+        return;
+      }
+
       setVerifying(true);
     } catch (err) {
-      console.error("Clerk Registration Full Error:", err);
-      const errorMessage = err.errors?.[0]?.longMessage || err.message || 'Failed to create account';
-      setError(errorMessage);
+      setError(err.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -78,27 +98,24 @@ export default function RegisterPage() {
 
   const handleVerify = async (e) => {
     e.preventDefault();
-    if (!isLoaded) return;
     setLoading(true);
     setError('');
 
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
+      const { data: { session }, error: verifyError } = await supabase.auth.verifyOtp({
+        email: formData.email,
+        token: code,
+        type: 'signup',
       });
 
-      if (completeSignUp.status !== 'complete') {
-        setError("Verification incomplete. Please check all fields.");
-      }
+      if (verifyError) throw verifyError;
 
-      if (completeSignUp.status === 'complete') {
-        await setActive({ session: completeSignUp.createdSessionId });
-
+      if (session) {
         await fetch("/api/user", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            clerkId: completeSignUp.createdUserId,
+            supabaseId: session.user.id,
             email: formData.email,
             fullName: formData.fullName,
             username: formData.username
@@ -106,9 +123,10 @@ export default function RegisterPage() {
         });
 
         router.push('/dashboard');
+        router.refresh();
       }
     } catch (err) {
-      setError(err.errors?.[0]?.longMessage || 'Failed to verify');
+      setError(err.message || 'Failed to verify');
     } finally {
       setLoading(false);
     }
@@ -225,7 +243,7 @@ export default function RegisterPage() {
               <div className="space-y-4">
                 <button
                   type="button"
-                  onClick={() => signUp.authenticateWithRedirect({ strategy: 'oauth_google', redirectUrl: '/sso-callback', redirectUrlComplete: '/dashboard' })}
+                  onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/auth/callback` } })}
                   className="w-full flex items-center justify-center gap-3 bg-white border-2 border-border-light h-14 rounded-2xl font-black text-ink hover:border-blue hover:bg-bg-surface transition-all active:scale-[0.98]"
                 >
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-5 h-5" />
@@ -234,7 +252,7 @@ export default function RegisterPage() {
 
                 <button
                   type="button"
-                  onClick={() => signUp.authenticateWithRedirect({ strategy: 'oauth_microsoft', redirectUrl: '/sso-callback', redirectUrlComplete: '/dashboard' })}
+                  onClick={() => supabase.auth.signInWithOAuth({ provider: 'azure', options: { redirectTo: `${window.location.origin}/auth/callback` } })}
                   className="w-full flex items-center justify-center gap-3 bg-white border-2 border-border-light h-14 rounded-2xl font-black text-ink hover:border-blue hover:bg-bg-surface transition-all active:scale-[0.98]"
                 >
                   <div className="w-5 h-5">
@@ -311,10 +329,12 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-black text-ink ml-1">Username</label>
                   <div className="relative group">
-                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-ink-muted font-black">schedulo.me/</span>
+                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-ink-muted font-black pointer-events-none select-none whitespace-nowrap z-10 bg-bg-surface pr-1">
+                      schedulo.me/
+                    </span>
                     <input
                       type="text"
-                      className="w-full h-14 pl-[115px] pr-5 rounded-2xl border-2 border-border-light bg-bg-surface focus:border-blue focus:bg-white outline-none font-bold text-ink transition-all"
+                      className="w-full h-14 pl-[135px] pr-5 rounded-2xl border-2 border-border-light bg-bg-surface focus:border-blue focus:bg-white outline-none font-bold text-ink transition-all placeholder:text-ink-muted relative z-20"
                       placeholder="username"
                       value={formData.username}
                       onChange={(e) => setFormData({...formData, username: e.target.value.toLowerCase()})}

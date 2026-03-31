@@ -1,20 +1,21 @@
 import { db } from "@/lib/db";
 import { appointments, users } from "@/lib/schema";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import { eq, desc, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
+    const supabase = await createClient();
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+    if (!supabaseUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.clerkId, clerkId));
+      .where(eq(users.supabaseId, supabaseUser.id));
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

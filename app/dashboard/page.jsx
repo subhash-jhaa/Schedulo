@@ -13,11 +13,12 @@ import {
   X,
   AlertCircle
 } from 'lucide-react';
-import { useUser } from '@clerk/nextjs';
+import { createClient } from '@/lib/supabase/client';
 import Sidebar from "@/components/Sidebar";
 
 export default function DashboardPage() {
-  const { user } = useUser();
+  const supabase = createClient();
+  const [user, setUser] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -25,8 +26,13 @@ export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    const init = async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      setUser(currentUser);
+      fetchAppointments();
+    };
+    init();
+  }, [supabase]);
 
   const fetchAppointments = async () => {
     try {
@@ -43,13 +49,13 @@ export default function DashboardPage() {
   };
 
   const copyLink = () => {
-    const slug = user?.username || user?.primaryEmailAddress?.emailAddress.split("@")[0];
+    const slug = user?.user_metadata?.username || user?.email?.split("@")[0];
     const link = typeof window !== 'undefined' ? `${window.location.origin}/book/${slug}` : '';
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
+// ... rest of the functions
   const cancelAppointment = async (id) => {
     try {
       const res = await fetch("/api/appointments/" + id, {
@@ -105,7 +111,7 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-10 text-white">
           <div>
             <h1 className="text-3xl font-syne font-bold mb-2 text-white">
-              Good {new Date().getHours() < 12 ? "morning" : "afternoon"}, {user?.firstName || "there"}
+              Good {new Date().getHours() < 12 ? "morning" : "afternoon"}, {user?.user_metadata?.full_name?.split(" ")[0] || "there"}
             </h1>
             <p className="text-white opacity-40">Here is what is happening today.</p>
           </div>

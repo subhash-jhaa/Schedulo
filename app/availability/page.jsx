@@ -11,7 +11,7 @@ import {
   CalendarDays,
   AlertCircle
 } from 'lucide-react';
-import { useUser } from '@clerk/nextjs';
+import { createClient } from '@/lib/supabase/client';
 import Sidebar from "@/components/Sidebar";
 
 // Generate time slots from 6:00 AM to 11:00 PM in 30-min increments
@@ -71,7 +71,8 @@ const commonTimezones = [
 ];
 
 export default function AvailabilityPage() {
-  const { user } = useUser();
+  const supabase = createClient();
+  const [user, setUser] = useState(null);
   const [days, setDays] = useState(defaultDays);
   const [timezone, setTimezone] = useState(() => {
     try {
@@ -88,28 +89,36 @@ export default function AvailabilityPage() {
 
   useEffect(() => {
     const loadAvailability = async () => {
-      if (!user) return;
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      setUser(currentUser);
+      
+      if (!currentUser) {
+        setInitialLoading(false);
+        return;
+      }
+
       try {
-        const res = await fetch(`/api/availability?userId=${user.id}`);
+        const res = await fetch("/api/availability");
         const data = await res.json();
         
         if (data && Array.isArray(data) && data.length > 0) {
           // Map fetched data to our day structure
           const mappedDays = defaultDays.map(d => {
-            const found = data.find(f => f.day === d.day);
+            const found = data.find(f => {
+              const dayIndex = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].indexOf(d.day);
+              return f.dayOfWeek === dayIndex;
+            });
             return found ? { 
-              day: found.day, 
-              enabled: found.enabled, 
-              startTime: found.startTime, 
-              endTime: found.endTime 
+              day: d.day, 
+              enabled: found.isActive, 
+              startTime: found.startTime.slice(0, 5), 
+              endTime: found.endTime.slice(0, 5) 
             } : d;
           });
           setDays(mappedDays);
           
-          // Use common settings from the first record if available
-          if (data[0].timezone) setTimezone(data[0].timezone);
-          if (data[0].duration) setDuration(Number(data[0].duration));
-          if (data[0].buffer) setBuffer(Number(data[0].buffer));
+          if (data[0].slotDuration) setDuration(Number(data[0].slotDuration));
+          if (data[0].bufferTime) setBuffer(Number(data[0].bufferTime));
         }
       } catch (error) {
         console.error("Error loading availability:", error);
@@ -118,10 +127,8 @@ export default function AvailabilityPage() {
       }
     };
     
-    if (user) {
-      loadAvailability();
-    }
-  }, [user]);
+    loadAvailability();
+  }, [supabase]);
 
   const handleSave = async () => {
     setIsSaving(true);

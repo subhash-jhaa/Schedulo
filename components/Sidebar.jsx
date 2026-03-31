@@ -9,7 +9,9 @@ import {
   LogOut, 
   Clock
 } from "lucide-react";
-import { UserButton, useUser, SignOutButton } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -19,7 +21,22 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user } = useUser();
+  const supabase = createClient();
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   return (
     <aside className="w-[240px] fixed left-0 top-0 h-screen bg-surface border-r border-white border-opacity-5 flex flex-col z-50">
@@ -55,19 +72,22 @@ export default function Sidebar() {
 
       <div className="p-6 mt-auto border-t border-white border-opacity-5 space-y-6">
         <div className="flex items-center gap-4 px-2 text-white font-inter">
-          <UserButton afterSignOutUrl="/" />
+          <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold">
+            {user?.email?.charAt(0).toUpperCase() || "U"}
+          </div>
           <div className="flex flex-col min-w-0 font-inter">
-            <span className="text-sm font-bold truncate text-white">{user?.fullName || "User"}</span>
-            <span className="text-xs opacity-40 truncate text-white">{user?.primaryEmailAddress?.emailAddress}</span>
+            <span className="text-sm font-bold truncate text-white">{user?.user_metadata?.full_name || "User"}</span>
+            <span className="text-xs opacity-40 truncate text-white">{user?.email}</span>
           </div>
         </div>
         
-        <SignOutButton>
-          <button className="w-full h-12 flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-400 hover:bg-opacity-10 rounded-xl transition-all border-none bg-transparent cursor-pointer">
-            <LogOut size={20} />
-            <span className="text-sm font-medium">Logout</span>
-          </button>
-        </SignOutButton>
+        <button 
+          onClick={handleSignOut}
+          className="w-full h-12 flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-400 hover:bg-opacity-10 rounded-xl transition-all border-none bg-transparent cursor-pointer"
+        >
+          <LogOut size={20} />
+          <span className="text-sm font-medium">Logout</span>
+        </button>
       </div>
     </aside>
   );

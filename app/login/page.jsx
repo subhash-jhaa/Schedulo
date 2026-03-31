@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useSignIn } from '@clerk/nextjs';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Loader2, Calendar as CalendarIcon } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const { isLoaded, signIn, setActive } = useSignIn();
+  const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -18,45 +18,41 @@ export default function LoginPage() {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    if (!isLoaded) return;
-
     setLoading(true);
     setError('');
 
     try {
-      const result = await signIn.create({
-        identifier: email,
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
         password,
       });
 
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        router.push('/dashboard');
-      } else {
-        console.error(result);
-      }
+      if (signInError) throw signInError;
+
+      router.push('/dashboard');
+      router.refresh();
     } catch (err) {
-      setError(err.errors[0]?.longMessage || 'Failed to sign in');
+      setError(err.message || 'Failed to sign in');
     } finally {
       setLoading(false);
     }
   };
 
-  const signInWithGoogle = () => {
-    if (!isLoaded) return;
-    signIn.authenticateWithRedirect({
-      strategy: 'oauth_google',
-      redirectUrl: '/sso-callback',
-      redirectUrlComplete: '/dashboard',
+  const signInWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
   };
 
-  const signInWithMicrosoft = () => {
-    if (!isLoaded) return;
-    signIn.authenticateWithRedirect({
-      strategy: 'oauth_microsoft',
-      redirectUrl: '/sso-callback',
-      redirectUrlComplete: '/dashboard',
+  const signInWithMicrosoft = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'azure',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
   };
 

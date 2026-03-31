@@ -1,20 +1,21 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { appointments, users } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function PATCH(req, { params }) {
   try {
-    const { userId: clerkId } = await auth();
+    const supabase = await createClient();
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
     const { id } = await params;
     const body = await req.json();
 
-    if (!clerkId) {
+    if (!supabaseUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.clerkId, clerkId));
+    const [user] = await db.select().from(users).where(eq(users.supabaseId, supabaseUser.id));
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
