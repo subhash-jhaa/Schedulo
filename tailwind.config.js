@@ -11,19 +11,29 @@ module.exports = {
         sans: ['var(--font-gilroy)', 'sans-serif'],
       },
       colors: {
-        background: '#ffffff',
-        surface: '#f8f9fb',
-        border: '#d4e0ed',
+        surface: {
+          DEFAULT: '#ffffff',
+          dark: '#0f172a', // slate-900
+          subtle: '#f8fafc', // slate-50
+        },
+        border: {
+          DEFAULT: '#e2e8f0', // slate-200
+          subtle: '#f1f5f9', // slate-100
+        },
+        brand: {
+          DEFAULT: '#0D9488', // teal-600
+          hover: '#0F766E', // teal-700
+          light: '#F0FDFA', // teal-50
+        },
         blue: {
-          DEFAULT: '#006bff',
-          dark: '#004eba',
-          soft: '#e6f0ff',
-          mid: '#b8dcff',
+          DEFAULT: '#2563eb', // blue-600
+          dark: '#1e40af', // blue-800
+          light: '#eff6ff', // blue-50
         },
         ink: {
-          DEFAULT: '#0b3558',
-          body: '#476788',
-          muted: '#68819b',
+          DEFAULT: '#0f172a', // slate-900
+          body: '#475569', // slate-600
+          muted: '#94a3b8', // slate-400
         }
       },
       boxShadow: {

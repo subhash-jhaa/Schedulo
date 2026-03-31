@@ -1,39 +1,15 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 :root {
-  --bg-primary: #ffffff;
-  --bg-surface: #f8f9fb;
-  --bg-card: #ffffff;
-  --border-default: #d4e0ed;
-  --text-dark: #0b3558;
-  --text-mid: #476788;
-  --text-light: #68819b;
-  --blue: #006bff;
-  --blue-light: #e6f0ff;
-  --blue-mid: #b8dcff;
-
-  --color-blue: var(--blue);
-  --color-blue-hover: #004eba;
-  --color-blue-light: var(--bg-surface);
-  --color-blue-subtle: var(--blue-light);
-  
-  --color-ink: var(--text-dark);
-  --color-ink-body: var(--text-mid);
-  --color-ink-muted: var(--text-light);
-  
-  --color-bg-subtle: var(--bg-surface);
-  --color-bg-alt: var(--bg-surface);
-  
-  --color-border: var(--border-default);
-  --color-border-light: var(--border-default);
-
-  /* Specific Component UI Colors */
-  --color-mac-red: #FF5F57;
-  --color-mac-yellow: #FEBC2E;
-  --color-mac-green: #28C840;
-  --color-success-bg: #F0FDF4;
-  --color-success-border: #DCFCE7;
-  --color-success-text: #16A34A;
+  --font-main: 'Plus Jakarta Sans', var(--font-gilroy), sans-serif;
+  --brand: #0d9488;
+  --brand-light: #f0fdfa;
+  --surface: #ffffff;
+  --surface-dark: #0f172a;
+  --border: #e2e8f0;
+  --ink: #0f172a;
+  --ink-body: #475569;
+  --ink-muted: #94a3b8;
 }
 
 @layer base {
@@ -47,76 +23,28 @@
   body {
     max-width: 100vw;
     overflow-x: hidden;
-    background-color: var(--bg-primary);
-    color: var(--text-dark);
+    background-color: #f8fafc;
+    color: var(--ink);
     -webkit-font-smoothing: antialiased;
-    line-height: 1.5;
-    font-size: 16px;
+    line-height: 1.6;
+    font-family: var(--font-main);
   }
 
   h1, h2, h3, h4 {
-    color: var(--text-dark);
-    letter-spacing: -0.01em;
-    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
   }
 }
 
-.max {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 32px;
-}
-
-/* Base Components & Utilities */
-.btn-primary {
-  background-color: #006BFF;
-  color: white;
-  padding: 14px 28px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 16px;
-  transition: background-color 0.2s;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background-color: #005ce6;
-}
-
-.btn-secondary {
-  border: 1px solid #D0D5DD;
-  color: #1D2939;
-  padding: 14px 28px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 16px;
-  transition: all 0.2s;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-  background-color: #F9FAFB;
-  border-color: #1D2939;
-}
-
 @layer utilities {
-  .text-blue { color: #006BFF; }
-  .text-ink { color: #1D2939; }
-  .text-ink-body { color: #475467; }
-  .text-ink-muted { color: #667085; }
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20;
+  }
   
-  .bg-blue { background-color: #006BFF; }
-  .bg-blue-light { background-color: #F2F8FF; }
-  .bg-bg-subtle { background-color: #F9FAFB; }
-  .bg-bg-alt { background-color: #F2F4F7; }
-  
-  .border-border { border-color: #D0D5DD; }
-  .border-border-light { border-color: #EAECF0; }
-  .border-blue { border-color: #006BFF; }
-  
-  .fill-blue-20 { fill: rgba(0, 107, 255, 0.2); }
+  .card-premium {
+    @apply bg-white border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 rounded-3xl;
+  }
 }
 
 /* Hero Section Styles */

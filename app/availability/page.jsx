@@ -170,16 +170,18 @@ export default function AvailabilityPage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-surface-dark flex text-white font-inter">
+      <div className="min-h-screen bg-[#f8fafc] flex font-sans antialiased text-slate-900">
         <Sidebar />
-        <main className="flex-1 ml-[240px] p-10 flex items-center justify-center">
+        <main className="flex-1 ml-[280px] p-8 md:p-12 flex flex-col items-center justify-center">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center gap-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center gap-6"
           >
-            <Loader2 className="animate-spin text-brand" size={40} />
-            <p className="text-sm opacity-40 font-inter">Loading your settings...</p>
+            <div className="w-16 h-16 bg-brand/5 rounded-3xl flex items-center justify-center text-brand">
+              <Loader2 className="animate-spin" size={32} />
+            </div>
+            <p className="text-sm font-black text-slate-500 uppercase tracking-widest">Synchronizing...</p>
           </motion.div>
         </main>
       </div>
@@ -187,171 +189,190 @@ export default function AvailabilityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-dark flex text-white font-inter">
+    <div className="min-h-screen bg-[#f8fafc] flex font-sans antialiased text-slate-900">
       <Sidebar />
       
-      <main className="flex-1 ml-[240px] p-10 overflow-auto">
-        <header className="mb-10 max-w-3xl">
-          <h1 className="text-4xl font-syne font-bold mb-2 tracking-tight">Your availability</h1>
-          <p className="text-white opacity-40 text-lg">Set the times you're open for bookings</p>
-        </header>
+      <main className="flex-1 ml-[280px] p-8 md:p-12 overflow-auto">
+        <div className="max-w-4xl mx-auto">
+          <header className="mb-12">
+            <h1 className="text-4xl font-black tracking-tight mb-2 text-slate-900">Availability Rules</h1>
+            <p className="text-slate-500 font-medium text-lg">Define when you are reachable for new appointments.</p>
+          </header>
 
-        <div className="max-w-3xl space-y-8">
-          {/* Timezone Section */}
-          <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-blue-500 bg-opacity-10 rounded-xl text-blue-400">
-                <Globe size={22} />
+          <div className="space-y-8">
+            {/* Timezone Section */}
+            <section className="p-8 bg-white border border-slate-200/60 rounded-[40px] shadow-sm relative overflow-hidden group">
+              <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand/5 rounded-full blur-3xl transition-all group-hover:scale-150" />
+              
+              <div className="flex items-center gap-5 mb-8 relative">
+                <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center border border-blue-100 shadow-sm">
+                  <Globe size={24} strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h3 className="font-black text-xl tracking-tight text-slate-900">Global Timezone</h3>
+                  <p className="text-sm font-bold text-slate-500 mt-0.5">Slots will automatically convert for your guests</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-lg font-syne">Your timezone</h3>
-                <p className="text-xs opacity-40 text-white font-inter">Used to coordinate your booking slots with guests</p>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <select 
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-                className="w-full appearance-none bg-surface-dark border border-white border-opacity-10 p-4 px-5 rounded-xl text-white focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none cursor-pointer hover:border-opacity-30 transition-all font-inter"
-              >
-                {!commonTimezones.includes(timezone) && (
-                   <option value={timezone}>{timezone}</option>
-                )}
-                {commonTimezones.map(tz => (
-                  <option key={tz} value={tz}>{tz}</option>
-                ))}
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                <Clock size={16} />
-              </div>
-            </div>
-          </section>
-
-          {/* Slot Settings Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-purple-500 bg-opacity-10 rounded-xl text-purple-400">
+              
+              <div className="relative max-w-md">
+                <select 
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  className="w-full appearance-none bg-slate-50 border border-slate-200 p-5 pr-12 rounded-2xl text-slate-700 font-bold focus:ring-4 focus:ring-brand/10 focus:border-brand outline-none cursor-pointer transition-all hover:bg-white"
+                >
+                  {!commonTimezones.includes(timezone) && (
+                     <option value={timezone}>{timezone}</option>
+                  )}
+                  {commonTimezones.map(tz => (
+                    <option key={tz} value={tz}>{tz}</option>
+                  ))}
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                   <Clock size={20} />
                 </div>
-                <h3 className="font-bold font-syne">Meeting duration</h3>
               </div>
-              <select 
-                value={duration}
-                onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full bg-surface-dark border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all font-inter"
-              >
-                {durations.map(d => <option key={d} value={d}>{d} minutes</option>)}
-              </select>
             </section>
 
-            <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-orange-500 bg-opacity-10 rounded-xl text-orange-400">
-                  <Settings2 size={20} />
+            {/* Slot Settings Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <section className="p-8 bg-white border border-slate-200/60 rounded-[40px] shadow-sm">
+                <div className="flex items-center gap-5 mb-8">
+                  <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center border border-purple-100">
+                    <Clock size={22} strokeWidth={2.5} />
+                  </div>
+                  <h3 className="font-black text-lg tracking-tight text-slate-900">Meeting Length</h3>
                 </div>
-                <h3 className="font-bold font-syne">Buffer time</h3>
-              </div>
-              <select 
-                value={buffer}
-                onChange={(e) => setBuffer(Number(e.target.value))}
-                className="w-full bg-surface-dark border border-white border-opacity-10 p-4 rounded-xl text-white outline-none cursor-pointer focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all font-inter"
-              >
-                {buffers.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
-              </select>
-            </section>
-          </div>
-
-          {/* Day Grid */}
-          <section className="p-8 bg-surface border border-white border-opacity-5 rounded-3xl shadow-xl">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 bg-brand bg-opacity-10 rounded-xl text-brand">
-                <CalendarDays size={22} />
-              </div>
-              <h3 className="font-bold text-lg font-syne">Work hours</h3>
-            </div>
-
-            <div className="space-y-3">
-              {days.map((day, i) => (
-                <motion.div 
-                  key={day.day}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + (i * 0.05) }}
-                  className="flex flex-col sm:flex-row items-center justify-between p-5 bg-surface-dark border border-white border-opacity-5 rounded-2xl group transition-all hover:border-opacity-10 bg-gradient-to-r hover:from-surface hover:to-surface-dark"
+                <select 
+                  value={duration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                  className="w-full bg-slate-50 border border-slate-200 p-5 rounded-2xl text-slate-700 font-bold outline-none cursor-pointer focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all"
                 >
-                  <div className="flex items-center gap-6 w-full sm:w-auto">
-                    {/* Toggle Switch */}
-                    <button 
-                      onClick={() => toggleDay(i)}
-                      className={`relative w-12 h-6 flex-shrink-0 rounded-full transition-all duration-300 border-none cursor-pointer ${day.enabled ? "bg-brand" : "bg-white bg-opacity-10"}`}
-                    >
-                      <motion.div 
-                        initial={false}
-                        animate={{ x: day.enabled ? 26 : 4 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg" 
-                      />
-                    </button>
-                    <span className={`font-bold w-16 transition-opacity font-syne ${day.enabled ? "opacity-100" : "opacity-30"}`}>
-                      {day.day.slice(0,3)}
-                    </span>
-                  </div>
+                  {durations.map(d => <option key={d} value={d}>{d} minutes</option>)}
+                </select>
+              </section>
 
-                  <div className={`flex items-center gap-4 transition-all w-full sm:w-auto justify-end ${day.enabled ? "opacity-100" : "opacity-20 pointer-events-none"}`}>
-                    <select 
-                      value={day.startTime}
-                      onChange={(e) => updateTime(i, 'startTime', e.target.value)}
-                      disabled={!day.enabled}
-                      className="bg-transparent border border-white border-opacity-10 p-2.5 rounded-xl text-sm text-white outline-none cursor-pointer hover:border-opacity-30 focus:border-brand transition-all font-inter"
-                    >
-                      {timeSlots.map(t => <option key={t.value} value={t.value} className="bg-surface">{t.label}</option>)}
-                    </select>
-                    <span className="opacity-20 text-xs font-inter uppercase tracking-widest">to</span>
-                    <select 
-                      value={day.endTime}
-                      onChange={(e) => updateTime(i, 'endTime', e.target.value)}
-                      disabled={!day.enabled}
-                      className="bg-transparent border border-white border-opacity-10 p-2.5 rounded-xl text-sm text-white outline-none cursor-pointer hover:border-opacity-30 focus:border-brand transition-all font-inter"
-                    >
-                      {timeSlots.map(t => <option key={t.value} value={t.value} className="bg-surface">{t.label}</option>)}
-                    </select>
+              <section className="p-8 bg-white border border-slate-200/60 rounded-[40px] shadow-sm">
+                <div className="flex items-center gap-5 mb-8">
+                  <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center border border-orange-100">
+                    <Settings2 size={22} strokeWidth={2.5} />
                   </div>
-                </motion.div>
-              ))}
+                  <h3 className="font-black text-lg tracking-tight text-slate-900">Gap Buffer</h3>
+                </div>
+                <select 
+                  value={buffer}
+                  onChange={(e) => setBuffer(Number(e.target.value))}
+                  className="w-full bg-slate-50 border border-slate-200 p-5 rounded-2xl text-slate-700 font-bold outline-none cursor-pointer focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all"
+                >
+                  {buffers.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
+                </select>
+              </section>
             </div>
-          </section>
 
-          {/* Save Button */}
-          <div className="sticky bottom-6 pt-4 pb-2 z-10">
-            <motion.button 
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              onClick={handleSave}
-              disabled={isSaving}
-              className={`w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-2xl transition-all cursor-pointer border-none font-syne text-lg ${
-                saveStatus === 'success' ? "bg-green-500 text-white" : 
-                saveStatus === 'error' ? "bg-red-500 text-white" :
-                "bg-brand text-black hover:bg-brand-hover"
-              }`}
-            >
-              {isSaving ? (
-                <Loader2 className="animate-spin" size={24} />
-              ) : saveStatus === 'success' ? (
-                <>
-                  <Check size={24} />
-                  ✓ Saved!
-                </>
-              ) : saveStatus === 'error' ? (
-                <>
-                  <AlertCircle size={24} />
-                  Failed to save. Try again?
-                </>
-              ) : (
-                "Save changes"
-              )}
-            </motion.button>
+            {/* Day Grid */}
+            <section className="p-10 bg-white border border-slate-200/60 rounded-[48px] shadow-sm relative overflow-hidden">
+              <div className="flex items-center gap-5 mb-10">
+                <div className="w-14 h-14 bg-brand/5 text-brand rounded-2xl flex items-center justify-center border border-brand/10 shadow-sm shadow-brand/5">
+                  <CalendarDays size={26} strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h3 className="font-black text-2xl tracking-tight text-slate-900">Weekly Schedule</h3>
+                  <p className="text-sm font-bold text-slate-600 mt-0.5">Toggle and adjust your active hours</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {days.map((day, i) => (
+                  <motion.div 
+                    key={day.day}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + (i * 0.05) }}
+                    className={`flex flex-col md:flex-row items-center justify-between p-5 md:p-6 rounded-3xl transition-all duration-300 border ${
+                      day.enabled 
+                      ? "bg-slate-50/50 border-slate-200 shadow-sm" 
+                      : "bg-white border-transparent opacity-40 grayscale"
+                    }`}
+                  >
+                    <div className="flex items-center gap-8 w-full md:w-auto mb-4 md:mb-0">
+                      {/* Custom Toggle Switch */}
+                      <button 
+                        onClick={() => toggleDay(i)}
+                        className={`relative w-14 h-7 flex-shrink-0 rounded-full transition-all duration-300 border-none cursor-pointer ${day.enabled ? "bg-brand" : "bg-slate-300"}`}
+                      >
+                        <motion.div 
+                          initial={false}
+                          animate={{ x: day.enabled ? 32 : 4 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                          className="absolute top-1 w-5 h-5 bg-white rounded-full shadow-md" 
+                        />
+                      </button>
+                      <span className={`font-black w-24 text-lg tracking-tight ${day.enabled ? "text-slate-900" : "text-slate-400"}`}>
+                        {day.day}
+                      </span>
+                    </div>
+
+                    <div className={`flex items-center gap-4 transition-all w-full md:w-auto justify-end ${day.enabled ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+                      <div className="relative group">
+                        <select 
+                          value={day.startTime}
+                          onChange={(e) => updateTime(i, 'startTime', e.target.value)}
+                          disabled={!day.enabled}
+                          className="bg-white border-2 border-slate-200 px-4 py-3 rounded-2xl text-sm font-black text-slate-700 outline-none cursor-pointer hover:border-brand focus:border-brand transition-all shadow-sm"
+                        >
+                          {timeSlots.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                        </select>
+                      </div>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">to</span>
+                      <div className="relative">
+                        <select 
+                          value={day.endTime}
+                          onChange={(e) => updateTime(i, 'endTime', e.target.value)}
+                          disabled={!day.enabled}
+                          className="bg-white border-2 border-slate-200 px-4 py-3 rounded-2xl text-sm font-black text-slate-700 outline-none cursor-pointer hover:border-brand focus:border-brand transition-all shadow-sm"
+                        >
+                          {timeSlots.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
+
+            {/* Save Button */}
+            <div className="sticky bottom-8 pt-8 pb-4 z-20">
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSave}
+                disabled={isSaving}
+                className={`w-full h-20 rounded-[32px] font-black text-xl shadow-2xl flex items-center justify-center gap-4 transition-all cursor-pointer border-none ${
+                  saveStatus === 'success' ? "bg-emerald-500 text-white shadow-emerald-200" : 
+                  saveStatus === 'error' ? "bg-rose-500 text-white shadow-rose-200" :
+                  "bg-brand text-white shadow-brand/20 hover:bg-brand-hover"
+                }`}
+              >
+                {isSaving ? (
+                  <Loader2 className="animate-spin" size={28} />
+                ) : saveStatus === 'success' ? (
+                  <>
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <Check size={24} strokeWidth={3} />
+                    </div>
+                    <span>Settings Updated</span>
+                  </>
+                ) : saveStatus === 'error' ? (
+                  <>
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <AlertCircle size={24} strokeWidth={3} />
+                    </div>
+                    <span>Connection Failed</span>
+                  </>
+                ) : (
+                  "Update Availability"
+                )}
+              </motion.button>
+            </div>
           </div>
         </div>
       </main>
