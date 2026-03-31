@@ -21,9 +21,9 @@ module.exports = {
           subtle: '#f1f5f9', // slate-100
         },
         brand: {
-          DEFAULT: '#0D9488', // teal-600
-          hover: '#0F766E', // teal-700
-          light: '#F0FDFA', // teal-50
+          DEFAULT: '#006bff', // blue-600
+          hover: '#004eba', // blue-700
+          light: '#e6f0ff', // blue-50
         },
         blue: {
           DEFAULT: '#2563eb', // blue-600

@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #0d9488;
-  --color-brand-light: #f0fdfa;
-  --color-brand-hover: #0f766e;
+  --color-brand: #006bff;
+  --color-brand-light: #e6f0ff;
+  --color-brand-hover: #004eba;
   --color-surface: #ffffff;
   --color-surface-dark: #0f172a;
   --color-border: #e2e8f0;
@@ -14,7 +14,9 @@
 
 :root {
   --font-main: 'Plus Jakarta Sans', var(--font-gilroy), sans-serif;
+  --color-brand: #006bff;
   --brand: var(--color-brand);
+  --color-brand-light: #e6f0ff;
   --brand-light: var(--color-brand-light);
   --ink: var(--color-ink);
   --surface: var(--color-surface);
