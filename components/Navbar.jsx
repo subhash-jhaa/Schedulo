@@ -1,21 +1,20 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { Calendar } from 'lucide-react';
 
 export default function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] w-full bg-white/80 backdrop-blur-md border-b border-[#d4e0ed] h-20 transition-all duration-300">
+    <nav className="fixed top-0 left-0 right-0 z-[100] w-full bg-white/80 backdrop-blur-md border-b border-slate-200 h-20 transition-all duration-300">
       <div className="max-w-[1280px] mx-auto h-full px-12 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 bg-[#006bff] rounded-lg flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-              </svg>
+          <Link href="/" className="flex items-center gap-3 cursor-pointer group">
+            <div className="w-10 h-10 bg-brand rounded-xl flex items-center justify-center shadow-lg shadow-brand/20 group-hover:scale-105 transition-transform">
+              <Calendar size={22} className="text-white" strokeWidth={2.5} />
             </div>
-            <span className="text-2xl font-black text-[#0b3558] tracking-tight">Schedulo</span>
+            <span className="text-2xl font-black text-slate-900 tracking-tighter">Schedulo</span>
           </Link>
           
          

@@ -3,6 +3,8 @@ import { appointments, users } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/server";
 import { eq, desc, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { createCalendarEvent } from "@/lib/calendar";
+import { sendBookingConfirmation } from "@/lib/email";
 
 export async function GET() {
   try {
@@ -39,7 +41,6 @@ export async function POST(req) {
     const body = await req.json();
     const { hostUsername, guestName, guestEmail, guestNote, startTime, endTime, timezone } = body;
 
-    // Find host by username
     const [host] = await db.select().from(users).where(eq(users.username, hostUsername));
     if (!host) {
       return NextResponse.json({ error: "Host not found" }, { status: 404 });
@@ -78,27 +79,51 @@ export async function POST(req) {
       status: "confirmed",
     }).returning();
 
-    // Fire and forget — calendar + email
-    fetch("/api/calendar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        appointmentId: newAppointment.id,
-        hostUserId: host.id,
+    // Create Google Calendar event directly (no relative fetch)
+    let meetLink = null;
+    if (host.googleAccessToken) {
+      try {
+        const { eventId, hangoutLink } = await createCalendarEvent({
+          accessToken: host.googleAccessToken,
+          refreshToken: host.googleRefreshToken,
+          hostUserId: host.id,
+          title: `Meeting with ${guestName}`,
+          description: `Appointment booked via Schedulo. Guest: ${guestName} (${guestEmail}).`,
+          startTime: newStart,
+          endTime: newEnd,
+          guestEmail,
+          guestName,
+        });
+
+        await db.update(appointments)
+          .set({ googleEventId: eventId, meetLink: hangoutLink })
+          .where(eq(appointments.id, newAppointment.id));
+
+        meetLink = hangoutLink;
+      } catch (calError) {
+        console.error("Calendar event creation failed:", calError);
+        // Non-fatal: appointment is still created
+      }
+    }
+
+    // Send confirmation emails directly (no relative fetch)
+    try {
+      await sendBookingConfirmation({
+        hostName: host.name,
         guestName,
         guestEmail,
-        startTime,
-        endTime,
-      }),
-    });
+        hostEmail: host.email,
+        startTime: newStart,
+        endTime: newEnd,
+        timezone,
+        meetLink,
+      });
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Non-fatal
+    }
 
-    fetch("/api/email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appointmentId: newAppointment.id }),
-    });
-
-    return NextResponse.json({ success: true, appointment: newAppointment });
+    return NextResponse.json({ success: true, appointment: { ...newAppointment, meetLink } });
   } catch (error) {
     console.error("POST /api/appointments error:", error);
     return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });

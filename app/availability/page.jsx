@@ -134,21 +134,20 @@ export default function AvailabilityPage() {
     setIsSaving(true);
     setSaveStatus(null);
     try {
-      const res = await fetch("/api/availability", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ days, timezone, duration, buffer })
+      const res = await fetch('/api/availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          days,
+          duration,
+          buffer,
+          timezone,   // ← ADD THIS — `timezone` is already in component state
+        }),
       });
-      
-      if (res.ok) {
-        setSaveStatus('success');
-        setTimeout(() => setSaveStatus(null), 2000);
-      } else {
-        setSaveStatus('error');
-        setTimeout(() => setSaveStatus(null), 3000);
-      }
-    } catch (error) {
-      console.error("Error saving availability:", error);
+      if (!res.ok) throw new Error('Failed');
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus(null), 3000);
+    } catch (e) {
       setSaveStatus('error');
       setTimeout(() => setSaveStatus(null), 3000);
     } finally {
@@ -172,7 +171,7 @@ export default function AvailabilityPage() {
     return (
       <div className="min-h-screen bg-[#f8fafc] flex font-sans antialiased text-slate-900">
         <Sidebar />
-        <main className="flex-1 ml-[280px] p-8 md:p-12 flex flex-col items-center justify-center">
+        <main className="flex-1 md:ml-[280px] p-8 pt-16 md:pt-8 overflow-auto">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -192,7 +191,7 @@ export default function AvailabilityPage() {
     <div className="min-h-screen bg-[#f8fafc] flex font-sans antialiased text-slate-900">
       <Sidebar />
       
-      <main className="flex-1 ml-[280px] p-8 md:p-12 overflow-auto">
+      <main className="flex-1 md:ml-[280px] p-8 pt-16 md:pt-8 overflow-auto">
         <div className="max-w-4xl mx-auto">
           <header className="mb-12">
             <h1 className="text-4xl font-black tracking-tight mb-2 text-slate-900">Availability Rules</h1>

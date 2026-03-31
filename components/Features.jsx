@@ -37,8 +37,8 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-32 bg-white">
-      <div className="max">
+    <section className="py-16 md:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
         <motion.div 
           initial="hidden"
           whileInView="visible"
@@ -73,7 +73,7 @@ export default function Features() {
               key={i}
               variants={itemVariants}
               whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className="group p-10 border border-border-light rounded-3xl hover:border-blue hover:bg-bg-subtle transition-all duration-300"
+              className="group p-10 border border-transparent rounded-3xl hover:border-blue hover:bg-bg-subtle transition-all duration-300 shadow-sm hover:shadow-xl"
             >
               <div className="mb-8 p-4 bg-blue-light w-fit rounded-2xl group-hover:scale-110 transition-transform">
                 {f.icon}

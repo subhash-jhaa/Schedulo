@@ -18,8 +18,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
       <head>
         <meta name="color-scheme" content="light" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-[#0b3558]" style={{ fontFamily: 'var(--font-gilroy), sans-serif' }}>
+      <body className="min-h-full flex flex-col bg-white text-[#0b3558]">
         {children}
       </body>
     </html>

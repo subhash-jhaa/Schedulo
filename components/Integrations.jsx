@@ -39,13 +39,13 @@ export default function Integrations() {
   };
 
   return (
-    <section className="py-32 bg-white">
+    <section className="py-16 md:py-24 bg-white">
       <motion.div 
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         variants={containerVariants}
-        className="max text-center mb-16"
+        className="max-w-7xl mx-auto px-6 text-center mb-16"
       >
         <motion.h2 
           variants={itemVariants}
@@ -66,14 +66,14 @@ export default function Integrations() {
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         variants={containerVariants}
-        className="max grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
       >
         {tools.map((tool) => (
           <motion.div 
             key={tool.name} 
             variants={itemVariants}
             whileHover={{ y: -5, scale: 1.02, transition: { duration: 0.2 } }}
-            className="group bg-white border-2 border-[#E7EDF6] p-7 rounded-[22px] flex items-center gap-5 font-black text-[#0B3558] transition-all hover:border-[#006BFF] hover:shadow-2xl hover:shadow-blue-500/10 cursor-pointer"
+            className="group bg-white border-2 border-transparent hover:border-blue pl-8 pr-7 py-7 rounded-[22px] flex items-center gap-5 font-black text-[#0B3558] transition-all shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-2xl hover:shadow-blue-500/10 cursor-pointer"
           >
             <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center p-1 bg-[#F8F9FB] rounded-xl group-hover:bg-white transition-colors">
               <img src={tool.logo} alt={tool.name} className="w-full h-full object-contain" />

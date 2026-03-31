@@ -39,7 +39,7 @@ export default function CTA() {
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         variants={containerVariants}
-        className="max-w-[1240px] mx-auto bg-[#F2F8FF] rounded-[48px] p-10 md:p-24 text-center text-[#0B3558] relative overflow-hidden border border-[#D9E6F6] shadow-[0_32px_64px_-16px_rgba(11,53,88,0.08)]"
+        className="max-w-[1240px] mx-auto bg-[#F2F8FF] rounded-[48px] p-10 md:p-24 text-center text-[#0B3558] relative overflow-hidden border-2 border-transparent hover:border-[#D9E6F6] transition-all shadow-[0_32px_64px_-16px_rgba(11,53,88,0.08)]"
       >
         {/* Subtle decorative circles as seen in design */}
         <motion.div 

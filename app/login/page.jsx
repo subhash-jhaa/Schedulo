@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -15,6 +15,14 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) router.push('/dashboard');
+    };
+    checkSession();
+  }, [supabase, router]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -128,7 +136,7 @@ export default function LoginPage() {
           <div className="space-y-2">
             <div className="flex justify-between items-center ml-1">
               <label className="text-sm font-black text-slate-900">Password</label>
-              <Link href="/forgot-password" size="sm" className="text-xs font-bold text-brand hover:underline">
+              <Link href="/forgot-password" size="sm" className="text-xs font-bold text-brand hover:underline hover:text-brand-hover">
                 Forgot?
               </Link>
             </div>
@@ -165,15 +173,15 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-14 bg-blue text-white rounded-2xl font-black text-lg shadow-xl shadow-blue/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center disabled:opacity-70 disabled:hover:scale-100"
+            className="w-full h-14 bg-brand text-white rounded-2xl font-black text-lg shadow-xl shadow-brand/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center disabled:opacity-70 disabled:hover:scale-100"
           >
-            {loading ? <Loader2 className="animate-spin" /> : 'Sign in to account'}
+            {loading ? <Loader2 className="animate-spin" size={24} /> : 'Sign in to account'}
           </button>
         </form>
 
-        <p className="text-center mt-10 text-ink-body font-bold">
+        <p className="text-center mt-10 text-slate-500 font-bold">
           Don't have an account?{' '}
-          <Link href="/register" className="text-blue hover:underline font-black">
+          <Link href="/register" className="text-brand hover:underline font-black">
             Sign up
           </Link>
         </p>

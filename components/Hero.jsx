@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Check, Bell, Calendar as CalendarIcon, Clock, Mail, MapPin, ChevronLeft, ChevronRight, Globe, ChevronDown } from 'lucide-react';
+import { Sparkles, Check, Bell, Calendar as CalendarIcon, Calendar, Clock, Mail, MapPin, ChevronLeft, ChevronRight, Globe, ChevronDown } from 'lucide-react';
 
 export default function Hero() {
   const router = useRouter();
@@ -45,8 +45,8 @@ export default function Hero() {
   };
 
   return (
-    <section className="bg-white pt-24 pb-48 overflow-hidden relative">
-      <div className="max grid grid-cols-1 lg:grid-cols-2 gap-16 items-center text-left">
+    <section className="bg-white pt-16 pb-24 overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center text-left">
         <motion.div 
           initial="hidden"
           animate="show"
@@ -67,7 +67,7 @@ export default function Hero() {
             <motion.button 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="btn-social bg-blue"
+              className="btn-social bg-brand shadow-xl shadow-brand/20"
             >
               <div className="social-icon-box">
                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-5 h-5" />
@@ -115,13 +115,13 @@ export default function Hero() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 relative ${
-                  activeTab === tab.id ? 'text-blue' : 'text-ink-muted hover:text-ink'
+                  activeTab === tab.id ? 'text-brand' : 'text-slate-400 hover:text-slate-900'
                 }`}
               >
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-white rounded-xl shadow-md border border-border-light -z-10"
+                    className="absolute inset-0 bg-white rounded-xl shadow-md border border-slate-200 -z-10"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -144,7 +144,7 @@ export default function Hero() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-white rounded-[20px] border border-border-light shadow-2xl overflow-hidden flex flex-col"
+                  className="absolute inset-0 bg-white rounded-[20px] border-2 border-transparent hover:border-blue transition-all shadow-2xl overflow-hidden flex flex-col"
                 >
                   <div className="px-6 py-4 border-b border-border-light bg-white">
                     <h3 className="text-xl font-black text-ink tracking-tight">Share your booking page</h3>
@@ -154,10 +154,10 @@ export default function Hero() {
                     {/* Left Profile Section */}
                     <div className="w-[28%] p-4 space-y-4 bg-bg-surface/30">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-blue rounded flex items-center justify-center">
-                          <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4"><path d="M13 3l-2 3H3v15h18V3h-8zm6 16H5V8h14v11z"/></svg>
+                        <div className="w-6 h-6 bg-brand rounded flex items-center justify-center">
+                          <Calendar size={14} className="text-white" />
                         </div>
-                        <span className="text-[10px] font-black text-ink">{schedulingData.company}</span>
+                        <span className="text-[10px] font-black text-slate-900">{schedulingData.company}</span>
                       </div>
                       
                       <div className="space-y-3">
@@ -213,9 +213,9 @@ export default function Hero() {
                             <div 
                               key={i} 
                               className={`text-[10px] font-bold w-6 h-6 flex items-center justify-center mx-auto transition-all ${
-                                isSelected ? 'bg-blue text-white rounded-full shadow-md' :
-                                isAvailable ? 'text-blue bg-blue-light/30 rounded-full cursor-pointer hover:bg-blue/10' :
-                                !isCurrentMonth ? 'text-ink-muted/20' : 'text-ink'
+                                isSelected ? 'bg-brand text-white rounded-full shadow-md' :
+                                isAvailable ? 'text-brand bg-brand/10 rounded-full cursor-pointer hover:bg-brand/20' :
+                                !isCurrentMonth ? 'text-slate-200' : 'text-slate-900'
                               }`}
                             >
                               {d}
@@ -242,17 +242,17 @@ export default function Hero() {
                           <div key={t} className="flex flex-col gap-1.5 w-full">
                             {isConfirmed ? (
                               <>
-                                <div className="p-2 bg-slate-700/90 rounded-lg text-center text-[11px] font-black text-white">{t}</div>
+                                <div className="p-2 bg-slate-800 rounded-lg text-center text-[11px] font-black text-white">{t}</div>
                                 <motion.button 
                                   whileHover={{ scale: 1.02 }}
                                   whileTap={{ scale: 0.98 }}
-                                  className="p-2 bg-blue rounded-lg text-center text-[11px] font-black text-white shadow-md shadow-blue-500/20"
+                                  className="p-2 bg-brand rounded-lg text-center text-[11px] font-black text-white shadow-md shadow-brand/20"
                                 >
                                   Confirm
                                 </motion.button>
                               </>
                             ) : (
-                               <div className="p-2 border border-blue-light rounded-lg text-center text-[11px] font-black text-blue hover:bg-blue-light/10 transition-colors cursor-pointer">
+                               <div className="p-2 border border-brand/20 rounded-lg text-center text-[11px] font-black text-brand hover:bg-brand/5 transition-colors cursor-pointer">
                                  {t}
                                </div>
                             )}
@@ -266,9 +266,9 @@ export default function Hero() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1.2 }}
-                    className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md rounded-xl p-3 shadow-xl border border-border-light flex items-center gap-3 min-w-[200px] z-20"
+                    className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md border-2 border-transparent hover:border-blue transition-all rounded-xl p-3 shadow-xl flex items-center gap-3 min-w-[200px] z-20"
                   >
-                    <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
+                    <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand">
                       <Sparkles size={16} />
                     </div>
                     <div>
@@ -284,7 +284,7 @@ export default function Hero() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-white rounded-[20px] border border-border-light shadow-2xl p-6 flex flex-col gap-4"
+                  className="absolute inset-0 bg-white rounded-[20px] border-2 border-transparent hover:border-blue transition-all shadow-2xl p-6 flex flex-col gap-4"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">

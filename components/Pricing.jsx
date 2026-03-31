@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -50,8 +50,8 @@ export default function Pricing() {
   ];
 
   return (
-    <section className="py-32 bg-bg-subtle">
-      <div className="max">
+    <section className="py-16 md:py-24 bg-bg-subtle">
+      <div className="max-w-7xl mx-auto px-6">
         <motion.div 
           initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants} className="text-center mb-20"
@@ -71,7 +71,7 @@ export default function Pricing() {
           {plans.map((plan, i) => (
             <motion.div 
               key={i} variants={itemVariants} whileHover={{ y: -10 }}
-              className={`relative p-10 rounded-[40px] border-2 transition-all bg-white ${plan.popular ? 'border-blue shadow-2xl shadow-blue-500/10 z-10' : 'border-border-light hover:border-blue/30'}`}
+              className={`relative p-10 rounded-[40px] border-2 transition-all bg-white border-transparent hover:border-blue ${plan.popular ? 'shadow-2xl shadow-blue-500/10 z-10' : 'shadow-sm hover:shadow-xl'}`}
             >
               {plan.popular && (
                 <div className="absolute -top-5 left-1/2 -track-x-1/2 -translate-x-1/2 bg-blue text-white px-6 py-2 rounded-full text-sm font-black uppercase tracking-widest shadow-lg">Most Popular</div>

@@ -49,12 +49,12 @@ export default function RegisterPage() {
   const handleBack = () => setStep(s => s - 1);
 
   const handleRegister = async (e) => {
-    if (e && e.preventDefault) e.preventDefault();
+    e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -65,32 +65,10 @@ export default function RegisterPage() {
         },
       });
 
-      if (signUpError) throw signUpError;
-
-      if (data?.session) {
-        // Email verification is disabled, user is logged in immediately
-        await fetch("/api/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fullName: formData.fullName,
-            email: formData.email,
-            username: formData.username
-          })
-        });
-        router.push('/dashboard');
-        return;
-      }
-
-      if (data?.user?.identities?.length === 0) {
-        setError('User already exists');
-        setLoading(false);
-        return;
-      }
-
-      setVerifying(true);
+      if (error) throw error;
+      setStep(2);
     } catch (err) {
-      setError(err.message || 'Failed to create account');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -99,7 +77,7 @@ export default function RegisterPage() {
   const handleVerify = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const { data: { session }, error: verifyError } = await supabase.auth.verifyOtp({
@@ -109,24 +87,28 @@ export default function RegisterPage() {
       });
 
       if (verifyError) throw verifyError;
+      if (!session) throw new Error("Session not found after verification");
 
-      if (session) {
-        await fetch("/api/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            supabaseId: session.user.id,
-            email: formData.email,
-            fullName: formData.fullName,
-            username: formData.username
-          })
-        });
+      // Sync user to our database
+      const syncRes = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          username: formData.username
+        })
+      });
 
-        router.push('/dashboard');
-        router.refresh();
+      if (!syncRes.ok) {
+        const errorData = await syncRes.json();
+        throw new Error(errorData.error || "Failed to sync user data");
       }
+
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
-      setError(err.message || 'Failed to verify');
+      setError(err.message);
     } finally {
       setLoading(false);
     }

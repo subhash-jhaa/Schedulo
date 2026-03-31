@@ -35,7 +35,7 @@ export async function POST(req) {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const body = await req.json();
-    const { days, duration, buffer } = body;
+    const { days, duration, buffer, timezone } = body;
 
     // Clean delete and re-insert
     await db.delete(availability).where(eq(availability.userId, user.id));
@@ -48,6 +48,7 @@ export async function POST(req) {
       isActive: day.enabled,
       slotDuration: parseInt(duration),
       bufferTime: parseInt(buffer),
+      timezone: timezone || 'UTC',   // ← ADD THIS
     }));
 
     if (insertData.length > 0) {

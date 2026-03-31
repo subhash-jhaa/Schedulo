@@ -22,8 +22,10 @@ export default function DashboardPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [cancellingId, setCancellingId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reschedulingId, setReschedulingId] = useState(null);
+  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
+  const [newSlot, setNewSlot] = useState({ date: '', time: '' });
 
   useEffect(() => {
     const init = async () => {
@@ -74,6 +76,33 @@ export default function DashboardPage() {
     }
   };
 
+  const rescheduleAppointment = async (id) => {
+    if (!newSlot.date || !newSlot.time) return;
+    try {
+      const appt = safeAppointments.find(a => a.id === id);
+      const duration = (new Date(appt.endTime) - new Date(appt.startTime));
+      const newStart = new Date(`${newSlot.date}T${newSlot.time}`);
+      const newEnd = new Date(newStart.getTime() + duration);
+
+      const res = await fetch(`/api/appointments/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'confirmed',
+          startTime: newStart.toISOString(),
+          endTime: newEnd.toISOString(),
+        }),
+      });
+      if (res.ok) {
+        fetchAppointments();
+        setIsRescheduleOpen(false);
+        setReschedulingId(null);
+      }
+    } catch (error) {
+      console.error('Reschedule error:', error);
+    }
+  };
+
   const getInitials = (name) => {
     if (!name) return '??';
     return name.split(" ").map(n => n[0]).join("").toUpperCase();
@@ -106,7 +135,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#f8fafc] flex font-sans antialiased text-slate-900">
       <Sidebar />
       
-      <main className="flex-1 ml-[280px] p-8 md:p-12 overflow-auto">
+      <main className="flex-1 md:ml-[280px] p-8 pt-16 md:pt-8 overflow-auto">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
@@ -241,7 +270,14 @@ export default function DashboardPage() {
                         </td>
                         <td className="px-6 py-5 last:rounded-r-[28px] text-right pr-6">
                           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button className="p-3 text-slate-500 hover:text-brand hover:bg-white rounded-xl transition-all font-black text-xs uppercase tracking-widest border border-transparent hover:border-slate-200">
+                            <button
+                              onClick={() => {
+                                setReschedulingId(app.id);
+                                setIsRescheduleOpen(true);
+                                setNewSlot({ date: '', time: '' });
+                              }}
+                              className="p-3 text-slate-500 hover:text-brand hover:bg-white rounded-xl transition-all font-black text-xs uppercase tracking-widest border border-transparent hover:border-slate-200"
+                            >
                               Reschedule
                             </button>
                             {app.status !== 'cancelled' && (
@@ -296,6 +332,57 @@ export default function DashboardPage() {
                   className="w-full py-5 bg-slate-50 text-slate-500 rounded-2xl font-black text-lg hover:bg-slate-100 transition-all mt-2"
                 >
                   Never mind
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isRescheduleOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/40 backdrop-blur-xl">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white p-10 rounded-[40px] max-w-sm w-full text-center shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-200"
+            >
+              <h3 className="text-2xl font-black tracking-tight mb-6">Reschedule</h3>
+              <div className="space-y-4 text-left mb-8">
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">New Date</label>
+                  <input
+                    type="date"
+                    value={newSlot.date}
+                    onChange={e => setNewSlot(s => ({ ...s, date: e.target.value }))}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-brand"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">New Time</label>
+                  <input
+                    type="time"
+                    value={newSlot.time}
+                    onChange={e => setNewSlot(s => ({ ...s, time: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-brand"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => rescheduleAppointment(reschedulingId)}
+                  disabled={!newSlot.date || !newSlot.time}
+                  className="w-full py-4 bg-brand text-white rounded-2xl font-black text-base shadow-lg shadow-brand/20 hover:bg-brand/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  Confirm Reschedule
+                </button>
+                <button
+                  onClick={() => setIsRescheduleOpen(false)}
+                  className="w-full py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-base hover:bg-slate-100 transition-all"
+                >
+                  Cancel
                 </button>
               </div>
             </motion.div>

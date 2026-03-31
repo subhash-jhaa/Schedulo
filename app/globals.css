@@ -1,15 +1,23 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand: #0d9488;
+  --color-brand-light: #f0fdfa;
+  --color-brand-hover: #0f766e;
+  --color-surface: #ffffff;
+  --color-surface-dark: #0f172a;
+  --color-border: #e2e8f0;
+  --color-ink: #0f172a;
+  --color-ink-body: #475569;
+  --color-ink-muted: #94a3b8;
+}
+
 :root {
   --font-main: 'Plus Jakarta Sans', var(--font-gilroy), sans-serif;
-  --brand: #0d9488;
-  --brand-light: #f0fdfa;
-  --surface: #ffffff;
-  --surface-dark: #0f172a;
-  --border: #e2e8f0;
-  --ink: #0f172a;
-  --ink-body: #475569;
-  --ink-muted: #94a3b8;
+  --brand: var(--color-brand);
+  --brand-light: var(--color-brand-light);
+  --ink: var(--color-ink);
+  --surface: var(--color-surface);
 }
 
 @layer base {
@@ -24,14 +32,14 @@
     max-width: 100vw;
     overflow-x: hidden;
     background-color: #f8fafc;
-    color: var(--ink);
+    color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
     line-height: 1.6;
     font-family: var(--font-main);
   }
 
   h1, h2, h3, h4 {
-    color: var(--ink);
+    color: var(--color-ink);
     letter-spacing: -0.02em;
     font-weight: 800;
   }
@@ -70,7 +78,7 @@
 }
 .left { z-index: 1; max-width: 520px; }
 .hero-title {
-  font-size: clamp(36px, 4.2vw, 54px);
+  font-size: clamp(32px, 3.5vw, 48px);
   font-weight: 800;
   color: #0b3558;
   line-height: 1.05;
