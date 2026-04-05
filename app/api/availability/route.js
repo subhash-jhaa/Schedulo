@@ -10,8 +10,26 @@ export async function GET() {
     const { data: { user: supabaseUser } } = await supabase.auth.getUser();
     if (!supabaseUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const [user] = await db.select().from(users).where(eq(users.supabaseId, supabaseUser.id));
-    if (!user) return NextResponse.json([]);
+    let [user] = await db.select().from(users).where(eq(users.supabaseId, supabaseUser.id));
+    
+    // Auto-create/sync user if missing
+    if (!user) {
+      // Check if user exists with the same email first
+      const [byEmail] = await db.select().from(users).where(eq(users.email, supabaseUser.email));
+      if (byEmail) {
+        // Link the existing user record to this new Supabase ID
+        const [updated] = await db.update(users).set({ supabaseId: supabaseUser.id }).where(eq(users.id, byEmail.id)).returning();
+        user = updated;
+      } else {
+        const [newUser] = await db.insert(users).values({
+          supabaseId: supabaseUser.id,
+          email: supabaseUser.email,
+          name: supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0],
+          username: (supabaseUser.user_metadata?.username || supabaseUser.email.split('@')[0]).replace(/[^a-z0-9]/gi, '').toLowerCase() + Math.floor(Math.random() * 1000)
+        }).returning();
+        user = newUser;
+      }
+    }
 
     const userAvailability = await db
       .select()
@@ -31,8 +49,26 @@ export async function POST(req) {
     const { data: { user: supabaseUser } } = await supabase.auth.getUser();
     if (!supabaseUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const [user] = await db.select().from(users).where(eq(users.supabaseId, supabaseUser.id));
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    let [user] = await db.select().from(users).where(eq(users.supabaseId, supabaseUser.id));
+    
+    // Auto-create/sync user if missing
+    if (!user) {
+      // Check if user exists with the same email first
+      const [byEmail] = await db.select().from(users).where(eq(users.email, supabaseUser.email));
+      if (byEmail) {
+        // Link the existing user record to this new Supabase ID
+        const [updated] = await db.update(users).set({ supabaseId: supabaseUser.id }).where(eq(users.id, byEmail.id)).returning();
+        user = updated;
+      } else {
+        const [newUser] = await db.insert(users).values({
+          supabaseId: supabaseUser.id,
+          email: supabaseUser.email,
+          name: supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0],
+          username: (supabaseUser.user_metadata?.username || supabaseUser.email.split('@')[0]).replace(/[^a-z0-9]/gi, '').toLowerCase() + Math.floor(Math.random() * 1000)
+        }).returning();
+        user = newUser;
+      }
+    }
 
     const body = await req.json();
     const { days, duration, buffer, timezone } = body;
@@ -48,7 +84,7 @@ export async function POST(req) {
       isActive: day.enabled,
       slotDuration: parseInt(duration),
       bufferTime: parseInt(buffer),
-      timezone: timezone || 'UTC',   // ← ADD THIS
+      timezone: timezone || 'UTC',
     }));
 
     if (insertData.length > 0) {

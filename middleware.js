@@ -1,14 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function middleware(request) {
   let supabaseResponse = NextResponse.next({
     request,
   })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -29,15 +29,22 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data, error } = await supabase.auth.getUser()
+  const user = data?.user
 
+  const protectedRoutes = ['/dashboard', '/availability', '/settings', '/account']
+  const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
 
-  if (!user && (isProtected || isApiRoute)) {
+  if (!user && (isProtectedRoute || isApiRoute)) {
     if (isApiRoute) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'Unauthorized' }, 
+        { 
+          status: 401,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
     }
     const url = request.nextUrl.clone()
     url.pathname = '/login'

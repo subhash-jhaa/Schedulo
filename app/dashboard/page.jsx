@@ -11,7 +11,9 @@ import {
   CalendarCheck,
   Users,
   X,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  Zap
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import Sidebar from "@/components/Sidebar";
@@ -23,18 +25,40 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cancellingId, setCancellingId] = useState(null);
   const [reschedulingId, setReschedulingId] = useState(null);
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const [newSlot, setNewSlot] = useState({ date: '', time: '' });
+  const [aiBriefing, setAiBriefing] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       setUser(currentUser);
       fetchAppointments();
+      fetchAiBriefing();
     };
     init();
   }, [supabase]);
+
+  const fetchAiBriefing = async () => {
+    try {
+      const res = await fetch("/api/ai/briefing");
+      if (!res.ok) return; // Silent return for missing key/error
+      const data = await res.json();
+      if (data.status === 'no_key') {
+        setAiBriefing(null);
+      } else {
+        setAiBriefing(data.summary);
+      }
+    } catch (e) {
+      // Don't log or error out on missing key
+      setAiBriefing(null);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -77,9 +101,9 @@ export default function DashboardPage() {
   };
 
   const rescheduleAppointment = async (id) => {
-    if (!newSlot.date || !newSlot.time) return;
+    const appt = safeAppointments.find(a => a.id === id);
+    if (!newSlot.date || !newSlot.time || !appt) return;
     try {
-      const appt = safeAppointments.find(a => a.id === id);
       const duration = (new Date(appt.endTime) - new Date(appt.startTime));
       const newStart = new Date(`${newSlot.date}T${newSlot.time}`);
       const newEnd = new Date(newStart.getTime() + duration);
@@ -121,9 +145,9 @@ export default function DashboardPage() {
   const totalBookings = safeAppointments.length;
   const cancelledBookings = safeAppointments.filter(a => a.status === "cancelled").length;
   
-  const today = new Date();
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay());
+  const todayDate = new Date();
+  const startOfWeek = new Date(todayDate);
+  startOfWeek.setDate(todayDate.getDate() - todayDate.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
   const thisWeekBookings = safeAppointments.filter(
     a => new Date(a.startTime) >= startOfWeek
@@ -138,24 +162,63 @@ export default function DashboardPage() {
       <main className="flex-1 md:ml-[280px] p-8 pt-16 md:pt-8 overflow-auto">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
             <div>
               <h1 className="text-4xl font-black tracking-tight mb-2 text-slate-900">
                 Welcome back, {user?.user_metadata?.full_name?.split(" ")[0] || "Chief"}
               </h1>
-              <p className="text-slate-600 font-medium">Here's your schedule overview for today.</p>
+              <p className="text-slate-600 font-medium">Here&apos;s your schedule overview for today.</p>
             </div>
             
-            <button 
-              onClick={copyLink}
-              className="flex items-center gap-2 bg-white border border-slate-200 px-6 py-3.5 rounded-2xl shadow-sm hover:shadow-md hover:border-brand/30 transition-all font-bold text-slate-700 active:scale-[0.98]"
-            >
-              <div className="w-8 h-8 rounded-xl bg-brand/5 flex items-center justify-center text-brand">
-                {copied ? <Check size={18} /> : <Copy size={18} />}
-              </div>
-              <span>{copied ? "Copied!" : "Share Booking Link"}</span>
-            </button>
+            <div className="flex gap-3">
+              <button 
+                onClick={copyLink}
+                className="flex items-center gap-2 bg-white border border-slate-200 px-6 py-3.5 rounded-2xl shadow-sm hover:shadow-md hover:border-brand/30 transition-all font-bold text-slate-700 active:scale-[0.98]"
+              >
+                <div className="w-8 h-8 rounded-xl bg-brand/5 flex items-center justify-center text-brand">
+                  {copied ? <Check size={18} /> : <Copy size={18} />}
+                </div>
+                <span>{copied ? "Copied!" : "Share Link"}</span>
+              </button>
+            </div>
           </div>
+
+          {/* AI Briefing Widget */}
+          <AnimatePresence>
+            {(aiBriefing || aiLoading) && (
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-10 p-1 bg-gradient-to-r from-brand via-blue-500 to-purple-500 rounded-[32px] shadow-xl shadow-brand/10"
+              >
+                <div className="bg-white/95 backdrop-blur-xl p-8 rounded-[30px] flex gap-6 items-center">
+                  <div className="w-14 h-14 bg-brand/10 rounded-2xl flex items-center justify-center text-brand flex-shrink-0 animate-pulse">
+                    <Sparkles size={28} strokeWidth={2.5} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Smart Assistant</span>
+                      <div className="w-1 h-1 rounded-full bg-slate-300" />
+                      <span className="text-[10px] font-bold text-brand uppercase tracking-widest flex items-center gap-1">
+                        <Zap size={10} fill="currentColor" />
+                        Live
+                      </span>
+                    </div>
+                    {aiLoading ? (
+                      <div className="space-y-2">
+                        <div className="h-4 w-3/4 bg-slate-100 rounded animate-pulse" />
+                        <div className="h-4 w-1/2 bg-slate-100 rounded animate-pulse" />
+                      </div>
+                    ) : (
+                      <p className="text-lg font-bold text-slate-800 leading-relaxed italic">
+                        &quot;{aiBriefing}&quot;
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

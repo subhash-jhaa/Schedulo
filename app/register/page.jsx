@@ -46,6 +46,17 @@ export default function RegisterPage() {
     if (e && e.preventDefault) e.preventDefault();
     setStep(s => s + 1);
   };
+  const handleStep2Continue = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+
+    if (!formData.username.trim() || formData.password.length < 8) {
+      setError('Please enter a username and a password with at least 8 characters.');
+      return;
+    }
+
+    setError('');
+    setStep(3);
+  };
   const handleBack = () => setStep(s => s - 1);
 
   const handleRegister = async (e) => {
@@ -54,7 +65,7 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -66,7 +77,29 @@ export default function RegisterPage() {
       });
 
       if (error) throw error;
-      setStep(2);
+
+      if (data?.session) {
+        const syncRes = await fetch('/api/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: formData.fullName,
+            email: formData.email,
+            username: formData.username,
+          }),
+        });
+
+        if (!syncRes.ok) {
+          const errorData = await syncRes.json();
+          throw new Error(errorData.error || 'Failed to sync user data');
+        }
+
+        router.push('/dashboard');
+        router.refresh();
+        return;
+      }
+
+      setVerifying(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -133,7 +166,7 @@ export default function RegisterPage() {
             </div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-3">Check your email</h1>
             <p className="text-center text-slate-600 font-bold text-lg leading-relaxed">
-              We've sent a code to <span className="text-brand font-black">{formData.email}</span>
+              We&apos;ve sent a code to <span className="text-brand font-black">{formData.email}</span>
             </p>
           </div>
 
@@ -173,7 +206,7 @@ export default function RegisterPage() {
                 setStep(1);
               }}
             >
-              Wait, that's not my email
+              Wait, that&apos;s not my email
             </button>
           </form>
         </motion.div>
@@ -228,6 +261,7 @@ export default function RegisterPage() {
                   onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/auth/callback` } })}
                   className="w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-100 h-14 rounded-2xl font-black text-slate-700 hover:border-brand/40 hover:bg-slate-50 transition-all active:scale-[0.98]"
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-5 h-5" />
                   Sign up with Google
                 </button>
@@ -360,7 +394,8 @@ export default function RegisterPage() {
                 </div>
 
                 <button
-                  onClick={handleNext}
+                  type="button"
+                  onClick={handleStep2Continue}
                   className="w-full h-14 bg-brand text-white rounded-2xl font-black text-lg shadow-xl shadow-brand/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center mt-4"
                 >
                   Continue <ArrowRight className="ml-2" size={20} />
@@ -389,6 +424,7 @@ export default function RegisterPage() {
                 {CALENDAR_OPTIONS.map((opt) => (
                   <button
                     key={opt.id}
+                    type="button"
                     onClick={() => setFormData({...formData, calendar: opt.id})}
                     className={`flex items-center gap-4 p-5 rounded-3xl border-2 transition-all text-left ${
                       formData.calendar === opt.id 

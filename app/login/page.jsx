@@ -37,7 +37,7 @@ export default function LoginPage() {
 
       if (signInError) throw signInError;
 
-      router.push('/dashboard');
+      router.replace('/dashboard');
       router.refresh();
     } catch (err) {
       setError(err.message || 'Failed to sign in');
@@ -47,21 +47,41 @@ export default function LoginPage() {
   };
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (oauthError) throw oauthError;
+    } catch (err) {
+      setError(err.message || 'Failed to sign in with Google');
+      setLoading(false);
+    }
   };
 
   const signInWithMicrosoft = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'azure',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'azure',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (oauthError) throw oauthError;
+    } catch (err) {
+      setError(err.message || 'Failed to sign in with Microsoft');
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,6 +117,7 @@ export default function LoginPage() {
             className="w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-100 h-14 rounded-2xl font-black text-slate-700 hover:border-brand/40 hover:bg-slate-50 transition-all active:scale-[0.98]"
           >
             <div className="w-6 h-6 flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-5 h-5" />
             </div>
             Continue with Google
@@ -180,7 +201,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center mt-10 text-slate-500 font-bold">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" className="text-brand hover:underline font-black">
             Sign up
           </Link>

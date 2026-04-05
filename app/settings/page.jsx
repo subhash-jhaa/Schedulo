@@ -161,14 +161,41 @@ export default function SettingsPage() {
 
               {/* Calendar Status Card */}
               <div className="bg-white border border-slate-200/60 rounded-[32px] p-8 shadow-sm">
-                <h2 className="text-xl font-black tracking-tight mb-5">Connected Calendar</h2>
-                <div className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 bg-slate-50">
-                  <div className={`w-3 h-3 rounded-full ${dbUser?.googleAccessToken ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                  <div>
-                    <p className="font-black text-slate-800 text-sm">Google Calendar</p>
-                    <p className="text-xs text-slate-500 font-medium">
-                      {dbUser?.googleAccessToken ? 'Connected — events sync automatically' : 'Not connected'}
-                    </p>
+                <h2 className="text-xl font-black tracking-tight mb-2">Connected Calendars</h2>
+                <p className="text-slate-500 font-medium text-sm mb-6">Manage your calendar sync for availability and automatic booking.</p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white transition-all group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" className="w-6 h-6" alt="Google" />
+                      </div>
+                      <div>
+                        <p className="font-black text-slate-800 text-base">Google Calendar</p>
+                        <p className={`text-xs font-bold ${dbUser?.googleAccessToken ? 'text-emerald-500' : 'text-slate-400'}`}>
+                          {dbUser?.googleAccessToken ? 'Connected' : 'Not Connected'}
+                        </p>
+                      </div>
+                    </div>
+                    {!dbUser?.googleAccessToken && (
+                      <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black hover:bg-slate-50 transition-all">Connect</button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white transition-all group opacity-60">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
+                        <img src="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/assets/brand-icons/product/svg/outlook_48x1.svg" className="w-6 h-6" alt="Outlook" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-black text-slate-800 text-base">Outlook Calendar</p>
+                          <span className="px-1.5 py-0.5 bg-brand/10 text-brand text-[8px] font-black uppercase rounded-md tracking-widest">Coming Soon</span>
+                        </div>
+                        <p className="text-xs font-bold text-slate-400">Available in Pro</p>
+                      </div>
+                    </div>
+                    <button disabled className="px-4 py-2 bg-slate-100 border border-slate-100 rounded-xl text-xs font-black text-slate-300 cursor-not-allowed italic">Enabled Soon</button>
                   </div>
                 </div>
               </div>

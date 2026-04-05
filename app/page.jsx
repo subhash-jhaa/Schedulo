@@ -1,24 +1,23 @@
-﻿'use client';
+﻿import LandingAdditionalFeatures from '../components/landing/LandingAdditionalFeatures';
+import LandingBentoFeatures from '../components/landing/LandingBentoFeatures';
+import LandingDashboardMockup from '../components/landing/LandingDashboardMockup';
+import LandingFooter from '../components/landing/LandingFooter';
+import LandingHero from '../components/landing/LandingHero';
+import LandingNavbar from '../components/landing/LandingNavbar';
+import LandingTestimonials from '../components/landing/LandingTestimonials';
 
-import React from 'react';
-import Navbar from '../components/Navbar';
-import Hero from '../components/Hero';
-import Features from '../components/Features';
-import Integrations from '../components/Integrations';
-import Pricing from '../components/Pricing';
-import CTA from '../components/CTA';
-import Footer from '../components/Footer';
-
-export default function LandingPage() {
+export default function Page() {
   return (
-    <div className="landing-wrapper pt-20">
-      <Navbar />
-      <Hero />
-      <Features />
-      <Integrations />
-      <Pricing />
-      <CTA />
-      <Footer />
+    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+      <LandingNavbar />
+      <main>
+        <LandingHero />
+        <LandingDashboardMockup />
+        <LandingBentoFeatures />
+        <LandingTestimonials />
+        <LandingAdditionalFeatures />
+      </main>
+      <LandingFooter />
     </div>
   );
 }

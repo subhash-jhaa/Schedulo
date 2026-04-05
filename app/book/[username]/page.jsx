@@ -90,7 +90,7 @@ export default function BookingPage() {
       isSameDay(new Date(app.startTime), selectedDate)
     );
 
-    // generateSlots expects { startTime, endTime, duration, buffer, enabled }
+    // generateSlots expects { startTime, endTime, duration, buffer, enabled }, date, existingAppointments
     return generateSlots(
       { 
         startTime: daySetting.startTime, 
@@ -99,10 +99,8 @@ export default function BookingPage() {
         buffer: daySetting.bufferTime,
         enabled: daySetting.isActive 
       }, 
-      dayAppointments?.map(app => ({
-        time: format(new Date(app.startTime), 'HH:mm'),
-        status: app.status
-      }))
+      selectedDate,
+      hostData.appointments
     );
   }, [hostData, selectedDate]);
 
@@ -138,7 +136,13 @@ export default function BookingPage() {
 
       if (!res.ok) throw new Error("Booking failed");
       
-      router.push(`/confirmation?guest=${guestInfo.name}&host=${hostData.host.name}&date=${format(startTime, 'MMM d, yyyy')}&time=${format(startTime, 'h:mm a')}&tz=${userTimezone}`);
+      const bookedData = await res.json();
+      setConfirmationData({
+        host: hostData.host,
+        startTime: startTime,
+        endTime: endTime
+      });
+      setStep(3);
     } catch (err) {
       alert(err.message);
     } finally {
